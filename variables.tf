@@ -14,9 +14,9 @@ variable "platform" {
   })
 }
 
-variable "rs" {
-  description   = "todo"
-  type         = object({
+variable "<service>" {
+  description                             = "todo"
+  type                                    = object({
 
   })
 }
