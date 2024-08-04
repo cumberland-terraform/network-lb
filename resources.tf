@@ -27,25 +27,15 @@ resource "aws_lb_listener" "this" {
 }
 
 resource "aws_lb_listener_rule" "this" {
-    for_each                        = { for index, lb_rule in local.listener_rules:
-                                        index => lb_rule }
+    for_each                        = { for index, mapping in local.listener_rule_mappings:
+                                        index => mapping }
   
-    listener_arn                    = aws_lb_listener.this[
-                                        tostring(each.value.l_index)
-                                    ].arn
-    priority                        = each.value.rule_index
+    listener_arn                    = aws_lb_listener.this[tostring(each.value.l_i)].arn
+    priority                        = each.value.r_i
 
     action {
-        type                        = var.lb.listeners[
-                                        each.value.l_index
-                                    ].rules[
-                                        each.value.r_index
-                                    ].type
-        target_group_arn            = var.lb.listeners[
-                                        each.value.l_index
-                                    ].rules[
-                                        each.value.r_index
-                                    ].target_group_arn
+        type                        = var.lb.listeners[each.value.l_i].rules[each.value.r_i].type
+        target_group_arn            = var.lb.listeners[each.value.l_i].rules[each.value.r_i].target_group_arn
     }
 
     # TODO: parameterize this block

@@ -41,11 +41,11 @@ locals {
     #   objects so the `aws_lb_listener_rule` resources can be generated more
     #   efficiently.
     # See: https://developer.hashicorp.com/terraform/language/functions/flatten
-    listener_rules                      = flatten([
+    listener_rule_mappings              = flatten([
         for l_index, listener in var.lb.listeners: [
             for r_index, rule in listener.rules: {
-                listener_index          = l_index
-                rule_index              = r_index
+                l_i                     = l_index
+                r_i                     = r_index
             } 
         ]
     ])
