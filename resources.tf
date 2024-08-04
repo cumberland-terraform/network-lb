@@ -31,17 +31,21 @@ resource "aws_lb_listener_rule" "this" {
                                         index => lb_rule }
   
     listener_arn                    = aws_lb_listener.this[
-                                        tostring(each.value.listener_index)
+                                        tostring(each.value.l_index)
                                     ].arn
     priority                        = each.value.rule_index
 
     action {
         type                        = var.lb.listeners[
-                                        each.value.listener_index
-                                    ].rules[each.value.rule_index].type
+                                        each.value.l_index
+                                    ].rules[
+                                        each.value.r_index
+                                    ].type
         target_group_arn            = var.lb.listeners[
-                                        each.value.listener_index
-                                    ].rules[each.value.rule_index].target_group_arn
+                                        each.value.l_index
+                                    ].rules[
+                                        each.value.r_index
+                                    ].target_group_arn
     }
 
     # TODO: parameterize this block
