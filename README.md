@@ -10,7 +10,7 @@ The bare minimum deployment can be achieved with the following configuration,
 
 ```
 module "<service>" {
-	source          		= "ssh://git@source.mdthink.maryland.gov:22/et/mdt-eter-aws-core-<component>-<service>.git"
+	source          		= "ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-aws-core-<component>-<service>.git"
 	
 	platform	                = {
 		aws_region              = "<region-name>"
@@ -30,7 +30,7 @@ module "<service>" {
 }
 ```
 
-`platform` is a parameter for *all* **MDThink Enterprise Terraform** modules. For more information about the `platform`, in particular the permitted values of the nested fields, see the [mdt-eter-platform documentation](https://source.mdthink.maryland.gov/projects/ET/repos/mdt-eter-platform/browse). The following section goes into more detail regarding the `<service>` variable.
+`platform` is a parameter for *all* **MDThink Enterprise Terraform** modules. For more information about the `platform`, in particular the permitted values of the nested fields, see the [mdt-eter-platform documentation](https://source.mdthink.maryland.gov/projects/etm/repos/mdt-eter-platform/browse). The following section goes into more detail regarding the `<service>` variable.
 
 ### Parameters
 
