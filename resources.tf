@@ -15,7 +15,9 @@ resource "aws_lb_listener" "this" {
     load_balancer_arn               = aws_lb.this.arn
     port                            = each.value.port
     protocol                        = each.value.protocol
-    ssl_policy                      = local.platform_defaults.listener.ssl_policy
+    ssl_policy                      = each.value.certificate_arn != null ? (
+                                        local.platform_defaults.listener.ssl_policy
+                                    ) : null
     certificate_arn                 = each.value.certificate_arn
 
     default_action {
