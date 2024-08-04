@@ -6,7 +6,7 @@ locals {
         # TODO: conditional calculations go here
     }
 
-    ## <SERVICE> DEFAULTS
+    ## LOAD BALANCER DEFAULTS
     #   These are platform defaults and should only be changed when the 
     #       platform itself changes.
     platform_defaults                   = {
@@ -14,7 +14,7 @@ locals {
     }
     
     ## CALCULATED PROPERTIES
-    # Variables that store local calculations
+    #   Properties that change based on deployment configurations
     tags                                = merge({
         # TODO: service specific tags go here
     }, module.platform.tags)

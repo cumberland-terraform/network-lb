@@ -1,5 +1,5 @@
 # Enterprise Terraform 
-## AWS Core TEMPLATE
+## AWS Core Compute Elastic Load Balancer
 ### Overview
 
 This is a template. See [Module Setup documentation](https://source.mdthink.maryland.gov/projects/ETM/repos/mdt-eter-mod-docs/browse/procedures/05_module_setup.md) for information on its use.
@@ -9,8 +9,8 @@ This is a template. See [Module Setup documentation](https://source.mdthink.mary
 The bare minimum deployment can be achieved with the following configuration,
 
 ```
-module "<service>" {
-	source          		= "ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-aws-core-<component>-<service>.git"
+module "lb" {
+	source          		= "ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-aws-core-compute-lb.git"
 	
 	platform	                = {
 		aws_region              = "<region-name>"
@@ -24,13 +24,13 @@ module "<service>" {
                 availability_zones      = [ "<availability-zones>" ]
 	}
 
-	<service>			= {
+	lb			        = {
         # TODO
 	}
 }
 ```
 
-`platform` is a parameter for *all* **MDThink Enterprise Terraform** modules. For more information about the `platform`, in particular the permitted values of the nested fields, see the [mdt-eter-platform documentation](https://source.mdthink.maryland.gov/projects/etm/repos/mdt-eter-platform/browse). The following section goes into more detail regarding the `<service>` variable.
+`platform` is a parameter for *all* **MDThink Enterprise Terraform** modules. For more information about the `platform`, in particular the permitted values of the nested fields, see the [mdt-eter-platform documentation](https://source.mdthink.maryland.gov/projects/etm/repos/mdt-eter-platform/browse). The following section goes into more detail regarding the `lb` variable.
 
 ### Parameters
 
@@ -67,13 +67,12 @@ Once the commit has been tagged, a PR can be made from the `test` branch into th
 
 ### Pull Request Checklist
 
-Ensure each item on the following checklist is complete before updating any tenant deployments with a new version of the ``mdt-eter-core-compute-eks`` module,
+Ensure each item on the following checklist is complete before updating any tenant deployments with a new version of the ``mdt-eter-core-compute-lb`` module,
 
 - [] Update Changelog
-- [] Open PR into `test` branch
+- [] Merge into `test` branch
 - [] Ensure tests are passing in Jenkins
 - [] Increment `git tag` version
-- [] Merge PR into `test`
 - [] Open PR from `test` into `master` branch
 - [] Get approval from lead
 - [] Merge into `master`

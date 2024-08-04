@@ -14,8 +14,8 @@ variable "platform" {
   })
 }
 
-variable "<service>" {
-  description                             = "todo"
+variable "lb" {
+  description                             = "ECS Task Definition configuration object. See [README] (https://source.mdthink.maryland.gov/projects/etm/repos/mdt-eter-core-compute-ecs-svc/browse) for detailed information about the permitted values for each field"
   type                                    = object({
 
   })
