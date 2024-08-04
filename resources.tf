@@ -1,4 +1,8 @@
 resource "aws_lb" "this" {
+    lifecycle {
+      ignore_changes                = [ tags  ]
+    }
+    
     enable_deletion_protection      = local.platform_defaults.lb.enable_deletion_protection
     internal                        = local.platform_defaults.lb.internal
     load_balancer_type              = var.lb.load_balancer_type
