@@ -2,7 +2,7 @@ resource "aws_lb" "this" {
     lifecycle {
       ignore_changes                = [ tags  ]
     }
-    
+
     enable_deletion_protection      = local.platform_defaults.lb.enable_deletion_protection
     internal                        = local.platform_defaults.lb.internal
     load_balancer_type              = var.lb.load_balancer_type
@@ -35,7 +35,7 @@ resource "aws_lb_listener_rule" "this" {
                                         index => mapping }
   
     listener_arn                    = aws_lb_listener.this[tostring(each.value.l_i)].arn
-    # NOTE: index starts at 0, so add 1!
+    # NOTE: mapping priority to position of rule in list, but index starts at 0, so add 1!
     priority                        = each.value.r_i + 1 
 
     action {
