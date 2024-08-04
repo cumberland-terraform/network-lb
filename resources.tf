@@ -31,7 +31,8 @@ resource "aws_lb_listener_rule" "this" {
                                         index => mapping }
   
     listener_arn                    = aws_lb_listener.this[tostring(each.value.l_i)].arn
-    priority                        = each.value.r_i
+    # NOTE: index starts at 0, so add 1!
+    priority                        = each.value.r_i + 1 
 
     action {
         type                        = var.lb.listeners[each.value.l_i].rules[each.value.r_i].type
