@@ -1,7 +1,5 @@
 module "platform" {
-  source                = "git::ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-platform.git"
+  source                = "git::ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-platform.git?ref=v1.0.4&depth=1"
 
-  platform              = merge({
-    # SERVICE SPECIFIC PLATFORM ARGS GO HERE, IF ANY.
-  }, var.platform)
+  platform              = local.platform
 }

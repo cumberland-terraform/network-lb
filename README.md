@@ -2,7 +2,7 @@
 ## AWS Core Compute Elastic Load Balancer
 ### Overview
 
-This is a template. See [Module Setup documentation](https://source.mdthink.maryland.gov/projects/ETM/repos/mdt-eter-mod-docs/browse/procedures/05_module_setup.md) for information on its use.
+TODO
 
 ### Usage
 
