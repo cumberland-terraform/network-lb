@@ -23,3 +23,29 @@ resource "aws_lb_listener" "this" {
         target_group_arn                = each.value.default_action.target_group_arn
     }
 }
+
+resource "aws_lb_listener_rule" "this" {
+    for_each                        = { for index, lb_rule in local.local.listener_rules:
+                                        index => lb_rule }
+  
+    listener_arn                    = aws_lb_listener.this[
+                                        tostring(each.value.listener_index)
+                                    ].arn
+    priority                        = each.value.rule_index
+
+    action {
+        type                        = var.lb.listeners[
+                                        each.value.listener_index
+                                    ].rules[each.value.rule_index].type
+        target_group_arn            = var.lb.listeners[
+                                        each.value.listener_index
+                                    ].rules[each.value.rule_index].target_group_arn
+    }
+
+    # TODO: parameterize this block
+    condition {
+        host_header {
+            values = ["*"]
+        }
+    }
+}

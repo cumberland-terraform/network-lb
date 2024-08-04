@@ -36,5 +36,20 @@ locals {
         # TODO: service specific tags go here
     }, module.platform.tags)
 
+    ## LISTENER-RULE MAPPING
+    # This is a technique for generating a flat list of { role, policy } objects
+    #   so the ``aws_iam_role_policy_attachment`` resources can be generated more
+    #   efficiently. This local should not be altered. If you need to add a role
+    #   to a baseline deployment, do so through the `service_roles` map above.
+    #   Likewise with any policies that need attached to service roles.
+    # See: https://developer.hashicorp.com/terraform/language/functions/flatten
+    listener_rules                      = flatten([
+        for l_index, listener in var.lb.listeners: [
+            for r_index, rule in listener.rules: {
+                listener_index          = l_index
+                rule_index              = r_index
+            } 
+        ]
+    ])
 
 }
