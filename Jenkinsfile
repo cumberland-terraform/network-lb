@@ -1,6 +1,6 @@
 pipeline {
 	agent { 
-		label 'jenkins-slave-java' 
+		label						'jenkins-slave-java' 
 	}
 	
 	environment { 
@@ -11,6 +11,7 @@ pipeline {
 		TF_LOG 						= 'WARN'
 		TF_VER 						= '1.8.5'
 	}
+	
 	stages {
 		stage('Credentials') {
 			steps {
