@@ -28,7 +28,7 @@ variable "lb" {
         target_group_arn    = string
       })
       rules                 = optional(list(object({
-        action              = optional(string, "forward")
+        type                = optional(string, "forward")
         target_group_arn    = string
       })), [])
       certificate_arn       = optional(string, null)
