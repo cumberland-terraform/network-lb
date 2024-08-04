@@ -2,7 +2,7 @@ resource "aws_lb" "this" {
     enable_deletion_protection      = local.platform_defaults.lb.enable_deletion_protection
     internal                        = local.platform_defaults.lb.internal
     load_balancer_type              = var.lb.load_balancer_type
-    name                            = module.platform.prefixes.compute.load_balancer.name
+    name                            = module.platform.prefixes.compute.lb.name
     security_groups                 = local.lb.security_groups
     subnets                         = module.platform.network.subnets.ids
     tags                            = local.tags
