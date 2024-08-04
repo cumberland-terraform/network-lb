@@ -27,7 +27,7 @@ resource "aws_lb_listener" "this" {
 }
 
 resource "aws_lb_listener_rule" "this" {
-    for_each                        = { for index, lb_rule in local.local.listener_rules:
+    for_each                        = { for index, lb_rule in local.listener_rules:
                                         index => lb_rule }
   
     listener_arn                    = aws_lb_listener.this[
