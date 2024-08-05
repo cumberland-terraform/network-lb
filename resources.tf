@@ -52,7 +52,7 @@ resource "aws_lb_listener_rule" "this" {
 
     action {
         type                        = var.lb.listeners[each.value.l_i].rules[each.value.r_i].type
-        target_group_arn            = aws_lb_target_group.this[var.lb.listeners[each.value.l_i].rules[each.value.r_i].target_group_index]
+        target_group_arn            = aws_lb_target_group.this[var.lb.listeners[each.value.l_i].rules[each.value.r_i].target_group_index].arn
     }
 
     # TODO: parameterize this block
