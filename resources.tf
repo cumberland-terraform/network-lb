@@ -34,6 +34,10 @@ resource "aws_lb_target_group" "this" {
     for_each                        = { for index, target_group in var.lb.target_groups: 
                                         index => target_group }
 
+    lifecycle {
+      ignore_changes                = [ tags ]
+    }
+    
     name                            = module.platform.prefixes.compute.lb.target_group
     target_type                     = each.value.target_type
     port                            = each.value.port
