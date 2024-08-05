@@ -26,8 +26,20 @@ resource "aws_lb_listener" "this" {
 
     default_action {
         type                        = each.value.default_action.type
-        target_group_arn            = each.value.default_action.target_group_arn
+        target_group_arn            = aws_lb_target_group.this[each.value.default_action.target_group_index]
     }
+}
+
+resource "aws_lb_target_group" "this" {
+    for_each                        = { for index, target_group in var.lb.target_groups: 
+                                        index => target_group }
+
+    name                            = module.platform.prefixes.compute.lb.target_group
+    target_type                     = each.value.target_type
+    port                            = each.value.port
+    protocol                        = each.value.protocol
+    vpc_id                          = module.platform.network.vpc.id
+    tags                            = local.tags
 }
 
 resource "aws_lb_listener_rule" "this" {
@@ -40,7 +52,7 @@ resource "aws_lb_listener_rule" "this" {
 
     action {
         type                        = var.lb.listeners[each.value.l_i].rules[each.value.r_i].type
-        target_group_arn            = var.lb.listeners[each.value.l_i].rules[each.value.r_i].target_group_arn
+        target_group_arn            = aws_lb_target_group.this[var.lb.listeners[each.value.l_i].rules[each.value.r_i].target_group_index]
     }
 
     # TODO: parameterize this block

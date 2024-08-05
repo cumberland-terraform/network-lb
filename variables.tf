@@ -25,13 +25,19 @@ variable "lb" {
       protocol              = string
       default_action        = object({
         type                = optional(string, "forward")
-        target_group_arn    = string
+        target_group_index  = number
       })
       rules                 = optional(list(object({
         type                = optional(string, "forward")
-        target_group_arn    = string
+        target_group_index  = number
       })), [])
       certificate_arn       = optional(string, null)
-    })), [])    
+    })), [])
+
+    target_groups           = list(object({
+      port                  = number
+      protocol              = number
+      target_type           = optional(string, "ip")
+    }))
   })
 }
