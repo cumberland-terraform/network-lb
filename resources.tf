@@ -26,7 +26,7 @@ resource "aws_lb_listener" "this" {
 
     default_action {
         type                        = each.value.default_action.type
-        target_group_arn            = aws_lb_target_group.this[each.value.default_action.target_group_index]
+        target_group_arn            = aws_lb_target_group.this[each.value.default_action.target_group_index].arn
     }
 }
 
