@@ -30,7 +30,7 @@ locals {
                                         )
     }
     platform                            = merge({
-        subnet_type                     = "NETWORK ADDRESS TRANSLATION"
+
     }, var.platform)
     tags                                = merge({
         # TODO: service specific tags go here
