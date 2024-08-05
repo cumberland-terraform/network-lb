@@ -11,7 +11,7 @@ variable "platform" {
     domain                  = string
     availability_zones      = list(string)
     pca                     = string
-    subnet_type             = optional(string, "NETWORK ADDRESS TRANSLATION")
+    subnet_type             = optional(string, "PRIVATE")
   })
 }
 
