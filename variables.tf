@@ -23,21 +23,37 @@ variable "lb" {
     listeners               = optional(list(object({
       port                  = number
       protocol              = string
-      default_action        = object({
+      certificate_arn       = optional(string, null)
+      # <PROPERTY: `listeners[i].default_action`>
+      default_action        = optional(object({
         type                = optional(string, "forward")
-        target_group_index  = number
+        target_group_index  = optional(number, 0)
+      }), {
+        # <DEFAULT VALUES>
+        type                = "forward"
+        target_group_index  = 0
+        # </DEFAULT VALUES>
       })
+      # </PROPERTY: `listeners[i].default_action`>
+      # <PROPERTY: `listeners[i].rules`>
       rules                 = optional(list(object({
         type                = optional(string, "forward")
-        target_group_index  = number
-      })), [])
-      certificate_arn       = optional(string, null)
+        target_group_index  = optional(number, 0)
+      })), [{
+        # <DEFAULT VALUES>
+        type                = "forward"
+        target_group_index  = 0
+        # </DEFAULT VALUES>
+      }])
     })), [])
-
+    # </PROPERTY: `listeners[i].rules`>
+    # <PROPERTY: `listeners[i].target_groups`>
     target_groups           = list(object({
       port                  = number
-      protocol              = number
+      protocol              = string
       target_type           = optional(string, "ip")
     }))
+    # <PROPERTY: `listeners[i].target_groups`>
+
   })
 }
