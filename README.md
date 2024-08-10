@@ -48,7 +48,12 @@ TODO
         - `rules`: TODO. **NOTE**: The priority is determined by the order of the list. In other words, the first rule in the list is given the highest priority, with each subsequent item in the list given a lower priority than the one that preceded it. 
                 - `type`: TODO. Defaults to `forward`
                 - `target_group_arn`: ARN of the Target Group to which the rule will apply its action.
-
+- `target_groups`: TODO
+        - `port`: TODO
+        - `protocol`: TODO
+        - `target_id`: TODO
+        - `target_type`: TODO
+        
 ## Notes
 
 ### Accomodations for ECS Target Group Attachment
