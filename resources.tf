@@ -61,7 +61,7 @@ resource "aws_lb_listener_rule" "this" {
 
     # TODO: parameterize this block
     condition {
-        host_header {
+        path_pattern {
             values                  = ["*"]
         }
     }
