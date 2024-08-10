@@ -46,6 +46,25 @@ resource "aws_lb_target_group" "this" {
     tags                            = local.tags
 }
 
+resource "aws_lb_target_group_attachment" "this" {
+    # NOTE: The `target_group.target_id` attribute has to be made optional and then filtered
+    #           on null values for this reason: when deploying ECS services, the attachment
+    #           of containers to target groups is handled on the AWS side. However, the target
+    #           must exist. Therefore, this module has to create the target group for the ECS module
+    #           but NOT the target group attachment. When using ECS, the target group being passed in
+    #           through `lb.target_groups` should NOT contain `target_id` for this reason. In other words,
+    #           the target group attachment will not be provisioned unless the `target_id` for that target 
+    #           group is specified.
+    for_each                        = { for index, target_group in var.lb.target_groups: 
+                                            index => target_group 
+                                            if target_group.target_id != null  }
+
+
+    target_group_arn                = aws_lb_target_group.this[index].arn
+    target_id                       = each.value.target_id
+    port                            = try(each.value.port, null)
+}
+
 resource "aws_lb_listener_rule" "this" {
     for_each                        = { for index, mapping in local.listener_rule_mappings:
                                         index => mapping }
