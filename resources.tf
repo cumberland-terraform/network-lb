@@ -60,7 +60,7 @@ resource "aws_lb_target_group_attachment" "this" {
                                             if target_group.target_id != null  }
 
 
-    target_group_arn                = aws_lb_target_group.this[index].arn
+    target_group_arn                = aws_lb_target_group.this[each.key].arn
     target_id                       = each.value.target_id
     port                            = try(each.value.port, null)
 }
