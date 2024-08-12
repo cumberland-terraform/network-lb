@@ -57,6 +57,7 @@ resource "aws_lb_target_group_attachment" "this" {
     #           through `lb.target_groups` should NOT contain `target_id` for this reason. In other words,
     #           the target group attachment will not be provisioned unless the `target_id` for that target 
     #           group is specified.
+    depends_on                      = [ aws_lb_target_group.this ]
     for_each                        = { for index, target_group in var.lb.target_groups: 
                                             index => target_group 
                                             if target_group.target_id != null  }
