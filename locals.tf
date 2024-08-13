@@ -11,7 +11,7 @@ locals {
     #       platform itself changes.
     platform_defaults                   = {
         lb                              = {
-            enable_deletion_protection  = true
+            enable_deletion_protection  = false
             internal                    = true
         }
         listener                        = {
