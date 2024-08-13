@@ -6,7 +6,7 @@ resource "aws_lb" "this" {
     enable_deletion_protection      = local.platform_defaults.lb.enable_deletion_protection
     internal                        = local.platform_defaults.lb.internal
     load_balancer_type              = var.lb.load_balancer_type
-    name                            = module.platform.prefixes.compute.lb.name
+    name                            = local.lb.name
     security_groups                 = local.lb.security_groups
     subnets                         = module.platform.network.subnets.ids
     tags                            = local.tags
@@ -40,7 +40,11 @@ resource "aws_lb_target_group" "this" {
       ignore_changes                = [ tags ]
     }
     
-    name                            = module.platform.prefixes.compute.lb.target_group
+    name                            = lower(join("-", [
+                                        platform.prefixes.compute.lb.target_group,
+                                        var.lb.suffix,
+                                        "0${each.key}"
+                                    ]))
     target_type                     = each.value.target_type
     port                            = each.value.port
     protocol                        = each.value.protocol
