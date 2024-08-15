@@ -82,7 +82,13 @@ resource "aws_lb_listener_rule" "this" {
 
     action {
         type                        = var.lb.listeners[each.value.l_i].rules[each.value.r_i].type
-        target_group_arn            = aws_lb_target_group.this[var.lb.listeners[each.value.l_i].rules[each.value.r_i].target_group_index].arn
+        # the `target_group_index` is relative to the index of the listener, whereas the 
+        # `aws_lb_target_group` index must be absolute. to find the index of the the appropriate
+        # `aws_lb_target_group`, need to take all of the previous listeners up to `l_i` and sum up 
+        # the 
+        target_group_arn            = aws_lb_target_group.this[
+            var.lb.listeners[each.value.l_i].rules[each.value.r_i].target_group_index
+        ].arn
     }
 
     # TODO: parameterize this block
