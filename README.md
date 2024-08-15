@@ -4,57 +4,120 @@
 
 TODO
 
+**NOTE**: The Load Balancer is one of the more complicated modules supported by the MDTHINK DevOps team. It is recommended to read through the sections below carefully before employing this module.
+
 ### Usage
 
-The bare minimum deployment can be achieved with the following configuration,
+**Application Load Balancer**
+
+An ALB deployment can be achieved with the following configuration,
 
 ```
 module "lb" {
 	source          		= "ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-aws-core-compute-lb.git"
 	
-	platform	                = {
-		aws_region              = "<region-name>"
-                account                 = "<account-name>"
-                acct_env                = "<account-environment>"
-                agency                  = "<agency>"
-                program                 = "<program>"
-                app_env                 = "<application-environment>"
-                domain                  = "<active-directory-domain>"
-                pca                     = "<pca-code>"
-                availability_zones      = [ "<availability-zones>" ]
+	platform	                                = {
+		aws_region                              = "<region-name>"
+                account                                 = "<account-name>"
+                acct_env                                = "<account-environment>"
+                agency                                  = "<agency>"
+                program                                 = "<program>"
+                app                                     = "<>"
+                app_env                                 = "<application-environment>"
+                domain                                  = "<active-directory-domain>"
+                pca                                     = "<pca-code>"
+                availability_zones                      = [ "<availability-zones>" ]
 	}
 
-	lb			        = {
-        # TODO
-	}
+	lb			                        = {
+                listeners                               = [{
+                        port                            = 80
+                        protocol                        = "HTTP"
+                        default_action                  = {
+                                type                    = "forward"
+                                target_group_index      = 0
+                        }
+                        rules                           = [{
+                                action                  = "forward"
+                                target_group_index      = 0
+                        }]
+                }]
+                security_groups                         = [ "sg-id" ]
+                target_groups                           = [{
+                        port                            = 80
+                        protocol                        = "HTTP"
+                        target_id                       = "<target-id>"
+                }]
+    }
 }
 ```
+
+**Network Load Balancer**
+
+TODO
 
 `platform` is a parameter for *all* **MDThink Enterprise Terraform** modules. For more information about the `platform`, in particular the permitted values of the nested fields, see the [mdt-eter-platform documentation](https://source.mdthink.maryland.gov/projects/etm/repos/mdt-eter-platform/browse). The following section goes into more detail regarding the `lb` variable.
 
 ### Parameters
 
-TODO
+Module input are organized through the `lb` variable. The following bullet-pointed list details the hierarchy of this variable and the purpose of each property in its hierarchy. For the most part, these are simply the properties exposed by Terraform, as these values are passed directly to their corresponding resource. If the following explanations are insufficient, refer to the official Terraform documentation for [lb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb), [lb_listener](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener), [lb_listener_rule](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule), [lb_target_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) and [lb_target_group_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group_attachment).
 
-- `load_balancer_type`: TODO. Defaults to `application`.
-- `security_groups`: TODO. Defaults to an empty list.
-- `listeners`: TODO
-        - `port`: TODO
-        - `protocol`: TODO
-        - `certificate_arn`: TODO
-        - `default_action`: TODO
-                - `type`: TODO. Defaults to `forward`.
-                - `target_group_arn`: ARN of the Target Group to which the rule will apply its action.
-        - `rules`: TODO. **NOTE**: The priority is determined by the order of the list. In other words, the first rule in the list is given the highest priority, with each subsequent item in the list given a lower priority than the one that preceded it. 
-                - `type`: TODO. Defaults to `forward`
-                - `target_group_arn`: ARN of the Target Group to which the rule will apply its action.
-- `target_groups`: TODO
-        - `port`: TODO
-        - `protocol`: TODO
-        - `target_id`: TODO
-        - `target_type`: TODO
+- `load_balancer_type`: *Optional*. Type of load balancer to deploy. Defaults to `application`.
+- `security_groups`: *Optional*. List of security group IDs into which to deploy the load balancer. Defaults to an empty list.
+- `listeners`: *Optional*. A list of listener objects to associate with the load balancer. Technically optional, as the module can still be used without specifying any listeners.
+        - `port`: *Required*. Port on which the listener listens.
+        - `protocol`: *Required*. Protocol on which the listener listens.
+        - `certificate_arn`: *Optional*. Certificate ARN of the SSL/TLS certificate for the listener. Required if listener is listening on port 443. 
+        - `default_action`: *Optional*. Default action listener should apply to incoming requests. Defaults to forwarding to the first target group.
+                - `type`: *Optional*. Defaults to `forward`.
+                - `target_group_index`: Index of the Target Group to which the rule will apply its action.
+        - `rules`: List of rules for the listener to evaluate to determine how to handle incoming requests. The priority is determined by the order of the list. In other words, the first rule in the list is given the highest priority, with each subsequent item in the list given a lower priority than the one that preceded it. 
+                - `type`: *Optional*. Defaults to `forward`.
+                - `target_group_index`: Index of the Target Group to which the rule will apply its action.
+- `target_groups`: A list of target groups to provision.
+        - `port`: Port on which the target is listening.
+        - `protocol`: Protocol on which the target is listening.
+        - `target_id`: Target ID of the target group. This could be an IP address, the ARN of a Lambda function, etc. See AWS and Terraform documentation for more information.
+        - `target_type`: Type of target. See AWS and Terraform documentation for more information.
+- `suffix`: *Optional*. Suffix to append to all resource names. Defaults to `web`.
         
 ## Notes
+
+### Listener Target Group Attachments
+
+The `var.lb.listeners[*].rules[*].target_group_index` parameter is the index of the target group defined in the `var.lb.target_groups` parameter. For example, the following values of the `lb` variable,
+
+```
+lb			                        = {
+        listeners                               = [{
+                port                            = 80
+                protocol                        = "HTTP"
+                default_action                  = {
+                        type                    = "forward"
+                        target_group_index      = 0
+                }
+                rules                           = [{
+                        action                  = "forward"
+                        target_group_index      = 0
+                }, {
+                        action                  = "forward"
+                        target_group_index      = 1
+                }]
+        }]
+        security_groups                         = [ "sg-id" ]
+        target_groups                           = [{
+                port                            = 80
+                protocol                        = "HTTP"
+                target_id                       = "<target-id-1>"
+        }, {
+                port                            = 81
+                protocol                        = "HTTP"
+                target_id                       = "<target-id-2>"
+        }]
+}
+```
+
+will create a load balancer with a listener that has a rule to forward to `<target-id-1>` (`target_group_index = 0` because it is the first target group defined in `var.lb.target_groups`), and then another rule to forward to `<target-id-2>` (`target_group_index = 1` because it is the second target group defined in `var.lb.target_groups`). The priority of the rules is determined by their order in the rules list. In other words, the `<target-id-1>` rule is evaluated before the `<target-id-2>` rule. 
 
 ### Accomodations for ECS Target Group Attachment
 
