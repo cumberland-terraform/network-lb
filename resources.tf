@@ -89,6 +89,20 @@ resource "aws_lb_listener_rule" "this" {
         target_group_arn            = aws_lb_target_group.this[
             var.lb.listeners[each.value.l_i].rules[each.value.r_i].target_group_index
         ].arn
+
+        dynamic "redirect" {
+            # NOTE: dynamic block requires an iterable, so iterate over dummy index if rule type is `redirect`
+            #       in order to generate a redirect rule block.
+            for_each                = var.lb.listeners[each.value.l_i].rules[each.value.r_i].type == "redirect" ? (
+                                        toset([1]) 
+                                    ) : toset([])
+
+            content {
+                port                = var.lb.listeners[each.value.l_i].rules[each.value.r_i].port
+                protocol            = var.lb.listeners[each.value.l_i].rules[each.value.r_i].protocol
+                status_code         =  var.lb.listeners[each.value.l_i].rules[each.value.r_i].type
+            }
+        }
     }
 
     # TODO: parameterize this block
