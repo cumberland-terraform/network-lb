@@ -34,7 +34,7 @@ variable "lb" {
         #       These properties default to redirecting to HTTPS. 
         port                = optional(number, 443)
         protocol            = optional(string, "HTTPS")
-        status_code         = optional(number, 301)
+        status_code         = optional(string, "HTTP_301")
       }), {
         # <DEFAULT VALUES>
         type                = "forward"
@@ -51,7 +51,7 @@ variable "lb" {
         #       These properties default to redirecting to HTTPS. 
         port                = optional(number, 443)
         protocol            = optional(string, "HTTPS")
-        status_code         = optional(number, 301)
+        status_code         = optional(string, "HTTP_301")
       })), [{
         # <DEFAULT VALUES>
         type                = "forward"
