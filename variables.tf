@@ -56,6 +56,6 @@ variable "lb" {
       target_type           = optional(string, "ip")
     }))
     # <PROPERTY: `listeners[i].target_groups`>
-    suffix                  = optional(string, "01")
+    suffix                  = optional(string, "web")
   })
 }

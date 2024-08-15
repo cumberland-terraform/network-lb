@@ -37,7 +37,7 @@ locals {
 
     }, var.platform)
     tags                                = merge({
-        # TODO: service specific tags go here
+
     }, module.platform.tags)
 
     ## LISTENER-RULE MAPPING

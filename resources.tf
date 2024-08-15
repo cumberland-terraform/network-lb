@@ -42,6 +42,7 @@ resource "aws_lb_target_group" "this" {
     
     name                            = lower(join("-", [
                                         module.platform.prefixes.compute.lb.target_group,
+                                        var.lb.suffix,
                                         "0${each.key}"
                                     ]))
     target_type                     = each.value.target_type
