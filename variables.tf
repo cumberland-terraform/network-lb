@@ -29,16 +29,16 @@ variable "lb" {
       default_action        = optional(object({
         type                = optional(string, "forward")
         target_group_index  = optional(number, 0)
-      }), {
-        # <DEFAULT VALUES>
-        type                = "forward"
-        target_group_index  = 0
         # NOTE: if `type == "redirect"`, then the redirect block will use 
         #       the following properties to configure the redirect action.
         #       These properties default to redirecting to HTTPS. 
         port                = optional(number, 443)
         protocol            = optional(string, "HTTPS")
         status_code         = optional(number, 301)
+      }), {
+        # <DEFAULT VALUES>
+        type                = "forward"
+        target_group_index  = 0
         # </DEFAULT VALUES>
       })
       # </PROPERTY: `listeners[i].default_action`>
