@@ -33,7 +33,7 @@ resource "aws_lb_listener" "this" {
         dynamic "redirect" {
             # NOTE: dynamic block requires an iterable, so iterate over dummy index if rule type is `redirect`
             #       in order to generate a redirect rule block.
-            for_each                = each.value.default_action.type == "redirect" ? (
+            for_each                = each.value.default_action.action == "redirect" ? (
                                         toset([1]) 
                                     ) : toset([])
 
