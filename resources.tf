@@ -26,9 +26,10 @@ resource "aws_lb_listener" "this" {
 
     default_action {
         type                        = each.value.default_action.type
-        target_group_arn            = aws_lb_target_group.this[
-                                        tostring(each.value.default_action.target_group_index)
-                                    ].arn
+        target_group_arn            = each.value.default_action.type != "redirect" ? (
+                                        aws_lb_target_group.this[
+                                            tostring(each.value.default_action.target_group_index)
+                                        ].arn ) : null
 
         dynamic "redirect" {
             # NOTE: dynamic block requires an iterable, so iterate over dummy index if rule type is `redirect`
@@ -100,9 +101,10 @@ resource "aws_lb_listener_rule" "this" {
         # `aws_lb_target_group` index must be absolute. to find the index of the the appropriate
         # `aws_lb_target_group`, need to take all of the previous listeners up to `l_i` and sum up 
         # the 
-        target_group_arn            = aws_lb_target_group.this[
-            var.lb.listeners[each.value.l_i].rules[each.value.r_i].target_group_index
-        ].arn
+        target_group_arn            = var.lb.listeners[each.value.l_i].rules[each.value.r_i].type != "redirect" ? (
+                                        aws_lb_target_group.this[
+                                            var.lb.listeners[each.value.l_i].rules[each.value.r_i].target_group_index
+                                        ].arn ) : null
 
         dynamic "redirect" {
             # NOTE: dynamic block requires an iterable, so iterate over dummy index if rule type is `redirect`
