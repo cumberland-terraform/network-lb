@@ -40,7 +40,7 @@ resource "aws_lb_listener" "this" {
             content {
                 port                = each.value.default_action.port
                 protocol            = each.value.default_action.protocol
-                status_code         = each.value.default_action.type
+                status_code         = each.value.default_action.status_code
             }
         }
     }
@@ -114,7 +114,7 @@ resource "aws_lb_listener_rule" "this" {
             content {
                 port                = var.lb.listeners[each.value.l_i].rules[each.value.r_i].port
                 protocol            = var.lb.listeners[each.value.l_i].rules[each.value.r_i].protocol
-                status_code         =  var.lb.listeners[each.value.l_i].rules[each.value.r_i].type
+                status_code         =  var.lb.listeners[each.value.l_i].rules[each.value.r_i].status_code
             }
         }
     }
