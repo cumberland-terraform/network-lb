@@ -56,7 +56,7 @@ resource "aws_lb_target_group" "this" {
     }
     
     name                            = lower(join("-", [
-                                        module.platform.prefixes.compute.lb.target_group,
+                                        module.platform.prefixes.network.lb.target_group,
                                         var.lb.suffix,
                                         "0${each.key}"
                                     ]))
@@ -116,7 +116,7 @@ resource "aws_lb_listener_rule" "this" {
             content {
                 port                = var.lb.listeners[each.value.l_i].rules[each.value.r_i].port
                 protocol            = var.lb.listeners[each.value.l_i].rules[each.value.r_i].protocol
-                status_code         =  var.lb.listeners[each.value.l_i].rules[each.value.r_i].status_code
+                status_code         = var.lb.listeners[each.value.l_i].rules[each.value.r_i].status_code
             }
         }
     }

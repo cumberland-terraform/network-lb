@@ -23,7 +23,7 @@ locals {
     #   Properties that change based on deployment configurations
     lb                                  = {
         name                            = lower(join("-",[
-                                            module.platform.prefixes.compute.lb.name,
+                                            module.platform.prefixes.network.lb.name,
                                             var.lb.suffix
                                         ]))
         security_groups                 = concat(
