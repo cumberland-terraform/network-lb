@@ -53,5 +53,26 @@ locals {
             } 
         ]
     ])
+    # NOTE: The `target_group.target_id` attribute has to be made optional and then filtered
+    #           on null values for this reason: when deploying ECS services, the attachment
+    #           of containers to target groups is handled on the AWS side. However, the target
+    #           must exist. Therefore, this module has to create the target group for the ECS module
+    #           but NOT the target group attachment. When using ECS, the target group being passed in
+    #           through `lb.target_groups` should NOT contain `target_id` for this reason. In other words,
+    #           the target group attachment will not be provisioned unless the `target_id` for that target 
+    #           group is specified.
+    provisioned_attachments             = { for index, target_group in var.lb.target_groups: 
+                                            index => target_group 
+                                            if target_group.target_ids != null  }
 
+    ## ATTACHMENTS
+    target_group_attachments            = flatten([
+        for tgrp_index, target_group in local.provisioned_attachments: [
+            for t_id in target_group.target_ids: {
+                port                    = target_group.port
+                target_group_index      = tgrp_index
+                target_id               = t_id
+            }
+        ]
+    ])
 }

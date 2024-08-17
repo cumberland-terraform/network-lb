@@ -64,7 +64,7 @@ variable "lb" {
     target_groups           = list(object({
       port                  = number
       protocol              = string
-      target_id             = optional(string, null)
+      target_ids            = optional(list(string), null)
       target_type           = optional(string, "ip")
     }))
     # <PROPERTY: `listeners[i].target_groups`>

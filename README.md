@@ -63,8 +63,8 @@ TODO
 Module input are organized through the `lb` variable. The following bullet-pointed list details the hierarchy of this variable and the purpose of each property in its hierarchy. For the most part, these are simply the properties exposed by Terraform, as these values are passed directly to their corresponding resource. If the following explanations are insufficient, refer to the official Terraform documentation for [lb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb), [lb_listener](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener), [lb_listener_rule](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule), [lb_target_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) and [lb_target_group_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group_attachment).
 
 - `load_balancer_type`: *Optional*. Type of load balancer to deploy. Defaults to `application`.
-- `security_groups`: *Optional*. List of security group IDs into which to deploy the load balancer. Defaults to an empty list.
-- `listeners`: *Optional*. A list of listener objects to associate with the load balancer. Technically optional, as the module can still be used without specifying any listeners.
+- `security_groups`: *Optional*. List of security group IDs into which the load balancer deploys. Defaults to an empty list.
+- `listeners`: *Optional*. A list of listener objects to associate with the load balancer. Technically optional, as the module can still be used without specifying any listeners, but it is not very useful in this case.
         - `port`: *Required*. Port on which the listener listens.
         - `protocol`: *Required*. Protocol on which the listener listens.
         - `certificate_arn`: *Optional*. Certificate ARN of the SSL/TLS certificate for the listener. Required if listener is listening on port 443. 
@@ -79,6 +79,7 @@ Module input are organized through the `lb` variable. The following bullet-point
         - `protocol`: Protocol on which the target is listening.
         - `target_id`: Target ID of the target group. This could be an IP address, the ARN of a Lambda function, etc. See AWS and Terraform documentation for more information.
         - `target_type`: Type of target. See AWS and Terraform documentation for more information.
+        - `group_index`: The group to associate this target with. Defaults to `0`. This property should map to the `listeners.\*.rules.\*.target_group_index`.
 - `suffix`: *Optional*. Suffix to append to all resource names. Defaults to `web`.
         
 ## Notes

@@ -47,6 +47,7 @@ resource "aws_lb_listener" "this" {
     }
 }
 
+# TODO: this should only create a target group for each unique group index...
 resource "aws_lb_target_group" "this" {
     for_each                        = { for index, target_group in var.lb.target_groups: 
                                         index => target_group }
@@ -68,23 +69,13 @@ resource "aws_lb_target_group" "this" {
 }
 
 resource "aws_lb_target_group_attachment" "this" {
-    # NOTE: The `target_group.target_id` attribute has to be made optional and then filtered
-    #           on null values for this reason: when deploying ECS services, the attachment
-    #           of containers to target groups is handled on the AWS side. However, the target
-    #           must exist. Therefore, this module has to create the target group for the ECS module
-    #           but NOT the target group attachment. When using ECS, the target group being passed in
-    #           through `lb.target_groups` should NOT contain `target_id` for this reason. In other words,
-    #           the target group attachment will not be provisioned unless the `target_id` for that target 
-    #           group is specified.
     depends_on                      = [ aws_lb_target_group.this ]
-    for_each                        = { for index, target_group in var.lb.target_groups: 
-                                            index => target_group 
-                                            if target_group.target_id != null  }
+    for_each                        = { for index, attachment in local.target_group_attachments:
+                                        index => attachment }
 
-
-    target_group_arn                = aws_lb_target_group.this[each.key].arn
+    target_group_arn                = aws_lb_target_group.this[each.value.target_group_index].arn
     target_id                       = each.value.target_id
-    port                            = try(each.value.port, null)
+    port                            = each.value.port
 }
 
 resource "aws_lb_listener_rule" "this" {
@@ -97,10 +88,6 @@ resource "aws_lb_listener_rule" "this" {
 
     action {
         type                        = var.lb.listeners[each.value.l_i].rules[each.value.r_i].type
-        # the `target_group_index` is relative to the index of the listener, whereas the 
-        # `aws_lb_target_group` index must be absolute. to find the index of the the appropriate
-        # `aws_lb_target_group`, need to take all of the previous listeners up to `l_i` and sum up 
-        # the 
         target_group_arn            = var.lb.listeners[each.value.l_i].rules[each.value.r_i].type != "redirect" ? (
                                         aws_lb_target_group.this[
                                             var.lb.listeners[each.value.l_i].rules[each.value.r_i].target_group_index
