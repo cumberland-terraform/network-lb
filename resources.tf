@@ -47,7 +47,6 @@ resource "aws_lb_listener" "this" {
     }
 }
 
-# TODO: this should only create a target group for each unique group index...
 resource "aws_lb_target_group" "this" {
     for_each                        = { for index, target_group in var.lb.target_groups: 
                                         index => target_group }
