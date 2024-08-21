@@ -1,28 +1,26 @@
 pipeline {
 	agent { 
-		label						'jenkins-slave-java' 
+		label 						'jenkins-slave-java' 
 	}
 	
 	environment { 
-		BITBUCKET_KEY				= credentials('mdtjenkinsbgit')
+		BITBUCKET_KEY 				= credentials('mdtjenkinsbgit')
 		EMAIL_LIST 					= 'grant.moore@maryland.gov,aaron.ramirez@maryland.gov'
 		MODULE_NAME 				= 'lb'
 		OS_ARCH 					= 'amd64' 
 		TF_LOG 						= 'WARN'
 		TF_VER 						= '1.8.5'
 	}
-	
 	stages {
 		stage('Credentials') {
 			steps {
-				sh '''
+				sh 	'''
 					mkdir ~/.ssh
 					touch ~/.ssh/id_rsa
 					cat $(echo $BITBUCKET_KEY) > ~/.ssh/id_rsa
 					chmod 400 ~/.ssh/id_rsa
 					ssh-keyscan -t rsa source.mdthink.maryland.gov >> ~/.ssh/known_hosts
 				'''
-				}
 			}
 		}
 
@@ -50,6 +48,7 @@ pipeline {
 		}
 
 		/*
+		Uses recursive feature to lint subdirectories
 		Uses  force tag to return 0 exit code even when
 		issues are found. ONLY DURING INITIAL DEV
 		*/
@@ -62,7 +61,7 @@ pipeline {
 					tflint \
 						-f json \
 						--config .ci/.tflint.hcl \
-						> lint.json
+						| tee lint.json
 					aws s3 cp lint.json s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/lint/${BUILD_NUMBER}_lint_$(date +%s).json
 				'''
 			}
@@ -75,8 +74,8 @@ pipeline {
 						--format json \
 						--no-colour \
 						--soft-fail \
-						--tfvars-file ./.ci/tests/idengr.tfvars
-							> sec.json
+						--tfvars-file ./.ci/tests/idengr.tfvars \
+						| tee sec.json
 					aws s3 cp sec.json s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/sec/${BUILD_NUMBER}_sec_$(date +%s).json
 				'''
 			}
@@ -89,15 +88,13 @@ pipeline {
 						-no-color
 					terraform test \
 						-test-directory ./.ci/tests \
-						-json > test.json || true
+						-json | tee test.json || true
 					aws s3 cp test.json s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/test/${BUILD_NUMBER}_test_$(date +%s).json
 				'''
 			}
 		}
 
 		stage ('Document') {
-			when { expression { env.GIT_BRANCH == "master" } }
-
 			steps {
 				sh '''
 					terraform-docs \
