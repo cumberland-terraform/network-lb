@@ -79,7 +79,7 @@ variable "lb" {
         port                = 80
         healthy_threshold   = 6
         unhealthy_threshold = 2
-        timeout             = 5
+        timeout             = 3
         interval            = 5
         matcher             = "200-299"
       })
