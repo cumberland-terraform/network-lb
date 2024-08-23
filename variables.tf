@@ -74,7 +74,15 @@ variable "lb" {
         timeout             = optional(number, 5)
         interval            = optional(number, 5)
         matcher             = optional(string, "200-299")
-      }))
+      }), {
+        path                = "/"
+        port                = 80
+        healthy_threshold   = 6
+        unhealthy_threshold = 2
+        timeout             = 5
+        interval            = 5
+        matcher             = "200-299"
+      })
     }))
     # <PROPERTY: `listeners[i].target_groups`>
     suffix                  = optional(string, "web")
