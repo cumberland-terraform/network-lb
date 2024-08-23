@@ -73,8 +73,8 @@ variable "lb" {
         port                = optional(string, "traffic-port")
         healthy_threshold   = optional(number, 6)
         unhealthy_threshold = optional(number, 2)
-        timeout             = optional(number, 5)
-        interval            = optional(number, 5)
+        timeout             = optional(number, 3)
+        interval            = optional(number, 30)
         matcher             = optional(string, "200-299")
       }), {
         path                = "/"
