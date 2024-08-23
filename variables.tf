@@ -66,6 +66,15 @@ variable "lb" {
       protocol              = string
       target_ids            = optional(list(string), null)
       target_type           = optional(string, "ip")
+      health_check          = optional(object({
+        path                = optional(string, "/")
+        port                = optional(number, 80)
+        healthy_threshold   = optional(number, 6)
+        unhealthy_threshold = optional(number, 2)
+        timeout             = optional(number, 5)
+        interval            = optional(number, 5)
+        matcher             = optional(string, "200-299")
+      }))
     }))
     # <PROPERTY: `listeners[i].target_groups`>
     suffix                  = optional(string, "web")

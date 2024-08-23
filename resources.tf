@@ -65,6 +65,16 @@ resource "aws_lb_target_group" "this" {
     protocol                        = each.value.protocol
     vpc_id                          = module.platform.network.vpc.id
     tags                            = local.tags
+
+    health_check {
+        path                        = each.value.health_check.path
+        port                        = each.value.health_check.port
+        healthy_threshold           = each.value.health_check.healthy_threshold
+        unhealthy_threshold         = each.value.health_check.unhealthy_threshold
+        timeout                     = each.value.health_check.timeout
+        interval                    = each.value.health_check.interval
+        matcher                     = each.value.health_check.matcher
+    }
 }
 
 resource "aws_lb_target_group_attachment" "this" {
