@@ -111,6 +111,7 @@ resource "aws_lb_listener_rule" "this" {
                                     ) : toset([])
 
             content {
+                path                = var.lb.listeners[each.value.l_i].rules[each.value.r_i].path
                 port                = var.lb.listeners[each.value.l_i].rules[each.value.r_i].port
                 protocol            = var.lb.listeners[each.value.l_i].rules[each.value.r_i].protocol
                 status_code         = var.lb.listeners[each.value.l_i].rules[each.value.r_i].status_code
