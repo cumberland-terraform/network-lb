@@ -39,6 +39,7 @@ resource "aws_lb_listener" "this" {
                                     ) : toset([])
 
             content {
+                path                = each.value.default_action.path
                 port                = each.value.default_action.port
                 protocol            = each.value.default_action.protocol
                 status_code         = each.value.default_action.status_code
