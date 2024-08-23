@@ -68,7 +68,7 @@ variable "lb" {
       target_type           = optional(string, "ip")
       health_check          = optional(object({
         path                = optional(string, "/")
-        port                = optional(number, 80)
+        port                = optional(string, "traffic-port")
         healthy_threshold   = optional(number, 6)
         unhealthy_threshold = optional(number, 2)
         timeout             = optional(number, 5)
@@ -76,11 +76,11 @@ variable "lb" {
         matcher             = optional(string, "200-299")
       }), {
         path                = "/"
-        port                = 80
+        port                = "traffic-port"
         healthy_threshold   = 6
         unhealthy_threshold = 2
         timeout             = 3
-        interval            = 5
+        interval            = 30
         matcher             = "200-299"
       })
     }))
