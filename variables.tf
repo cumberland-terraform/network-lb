@@ -81,7 +81,7 @@ variable "lb" {
         port                = "traffic-port"
         healthy_threshold   = 6
         unhealthy_threshold = 2
-        timeout             = 5
+        timeout             = 3
         interval            = 30
         matcher             = "200-299"
       })
