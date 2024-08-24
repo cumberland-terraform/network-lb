@@ -43,6 +43,7 @@ resource "aws_lb_listener" "this" {
                 port                = each.value.default_action.port
                 protocol            = each.value.default_action.protocol
                 status_code         = each.value.default_action.status_code
+                query               = each.value.default_aciton.query
             }
         }
     }
@@ -115,6 +116,7 @@ resource "aws_lb_listener_rule" "this" {
                 port                = var.lb.listeners[each.value.l_i].rules[each.value.r_i].port
                 protocol            = var.lb.listeners[each.value.l_i].rules[each.value.r_i].protocol
                 status_code         = var.lb.listeners[each.value.l_i].rules[each.value.r_i].status_code
+                query               = var.lb.listeners[each.value.l_i].rules[each.value.r_i].query
             }
         }
     }
