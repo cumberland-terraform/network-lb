@@ -39,6 +39,7 @@ resource "aws_lb_listener" "this" {
                                     ) : toset([])
 
             content {
+                host                = each.value.default_action.host
                 path                = each.value.default_action.path
                 port                = each.value.default_action.port
                 protocol            = each.value.default_action.protocol
@@ -112,6 +113,7 @@ resource "aws_lb_listener_rule" "this" {
                                     ) : toset([])
 
             content {
+                host                = var.lb.listeners[each.value.l_i].rules[each.value.r_i].host
                 path                = var.lb.listeners[each.value.l_i].rules[each.value.r_i].path
                 port                = var.lb.listeners[each.value.l_i].rules[each.value.r_i].port
                 protocol            = var.lb.listeners[each.value.l_i].rules[each.value.r_i].protocol

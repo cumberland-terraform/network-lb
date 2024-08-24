@@ -32,6 +32,7 @@ variable "lb" {
         # NOTE: if `type == "redirect"`, then the redirect block will use 
         #       the following properties to configure the redirect action.
         #       These properties default to redirecting to HTTPS. 
+        host                = optional(string, "#{host}")
         path                = optional(string, "/#{path}")
         port                = optional(number, 443)
         protocol            = optional(string, "HTTPS")
@@ -51,6 +52,7 @@ variable "lb" {
         # NOTE: if `type == "redirect"`, then the redirect block will use 
         #       the following properties to configure the redirect action.
         #       These properties default to redirecting to HTTPS. 
+        host                = optional(string, "#{host}")
         path                = optional(string, "/#{path}")
         port                = optional(number, 443)
         protocol            = optional(string, "HTTPS")
