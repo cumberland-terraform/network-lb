@@ -43,7 +43,7 @@ resource "aws_lb_listener" "this" {
                 port                = each.value.default_action.port
                 protocol            = each.value.default_action.protocol
                 status_code         = each.value.default_action.status_code
-                query               = each.value.default_aciton.query
+                query               = each.value.default_action.query
             }
         }
     }
