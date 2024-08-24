@@ -121,10 +121,35 @@ resource "aws_lb_listener_rule" "this" {
         }
     }
 
-    # TODO: parameterize this block
-    condition {
-        path_pattern {
-            values                  = ["*"]
+    dynamic "condition" {
+        for_each                = { for index, condition in var.lb.listeners[each.value.l_i].rules[each.value.r_i].conditions:
+                                    index => condition }
+
+        content {
+
+            dynamic "host_header" {
+                # NOTE: dynamic block requires an iterable, so iterate over dummy index if rule 
+                #       type is `redirect` in order to generate a redirect rule block.
+                for_each                = condition.host_header != null ? (
+                                            toset([1]) 
+                                        ) : toset([])
+                
+                content {
+                    values              = condition.host_header.values
+                }
+            }
+
+            dynamic "path_pattern" {
+                # NOTE: dynamic block requires an iterable, so iterate over dummy index if rule 
+                #       type is `redirect` in order to generate a redirect rule block.
+                for_each                = condition.path_pattern != null ? (
+                                            toset([1]) 
+                                        ) : toset([])
+                
+                content {
+                    values              = condition.path_pattern.values
+                }
+            }
         }
     }
 }
