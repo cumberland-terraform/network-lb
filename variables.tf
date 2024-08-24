@@ -72,6 +72,7 @@ variable "lb" {
           path_pattern      = {
             values          = [ "*" ]
           }
+          host_header       = null
           # </DEFAULT VALUES: `listeners[i].rules.conditions`>
         }])
         # </PROPERTY: `listeners[i].rules.conditions`>
@@ -83,6 +84,7 @@ variable "lb" {
           path_pattern      = {
             values          = [ "*" ]
           }
+          host_header       = null
         }]
         # </DEFAULT VALUES>
       }])
