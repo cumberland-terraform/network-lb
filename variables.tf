@@ -56,36 +56,32 @@ variable "lb" {
         protocol            = optional(string, "HTTPS")
         status_code         = optional(string, "HTTP_301")
         query               = optional(string, "#{query}")
-        # NOTE: Only one condition can be specified! 
-        #       All of the others must be null!
+        # NOTE: conditions are optional!
         # <PROPERTY: `listeners[i].rules.conditions`>
-        # 
-        condition           = optional(object({
+        conditions          = optional(list(object({
           host_header       = optional(object({
             values          = list(string)
           }), null)
           path_pattern      = optional(object({
             values          = list(string)
           }), null)
-        }), {
+        })), [{
           # <DEFAULT VALUES: `listeners[i].rules.conditions`>
           path_pattern      = {
             values          = [ "*" ]
           }
-          host_header       = null
           # </DEFAULT VALUES: `listeners[i].rules.conditions`>
-        })
+        }])
         # </PROPERTY: `listeners[i].rules.conditions`>
       })), [{
         # <DEFAULT VALUES>
         type                = "forward"
         target_group_index  = 0
-        condition           = {
+        conditions          = [{
           path_pattern      = {
             values          = [ "*" ]
           }
-          host_header       = null
-        }
+        }]
         # </DEFAULT VALUES>
       }])
     })), [])
