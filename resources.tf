@@ -122,17 +122,20 @@ resource "aws_lb_listener_rule" "this" {
     }
 
     dynamic "condition" {
-        for_each                = { for index, condition in var.lb.listeners[each.value.l_i].rules[each.value.r_i].conditions:
-                                    index => condition }
+        # NOTE: dynamic block requires an iterable, so iterate over dummy index if rule 
+        #       type is `redirect` in order to generate a redirect rule block.
+        for_each                = var.lb.listeners[each.value.l_i].rules[each.value.r_i].condition == null ? (
+                                    toset([])
+                                ) : toset([var.lb.listeners[each.value.l_i].rules[each.value.r_i].condition]) 
 
         content {
 
             dynamic "host_header" {
                 # NOTE: dynamic block requires an iterable, so iterate over dummy index if rule 
                 #       type is `redirect` in order to generate a redirect rule block.
-                for_each                = condition.value.host_header != null ? (
-                                            toset([1]) 
-                                        ) : toset([])
+                for_each                = condition.value.host_header == null ? (
+                                            toset([]) 
+                                        ) : toset([1])
                 
                 content {
                     values              = condition.value.host_header.values
@@ -142,9 +145,9 @@ resource "aws_lb_listener_rule" "this" {
             dynamic "path_pattern" {
                 # NOTE: dynamic block requires an iterable, so iterate over dummy index if rule 
                 #       type is `redirect` in order to generate a redirect rule block.
-                for_each                = condition.value.path_pattern != null ? (
-                                            toset([1]) 
-                                        ) : toset([])
+                for_each                = condition.value.path_pattern == null ? (
+                                            toset([]) 
+                                        ) : toset([1])
                 
                 content {
                     values              = condition.value.path_pattern.values

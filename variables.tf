@@ -58,34 +58,33 @@ variable "lb" {
         query               = optional(string, "#{query}")
         # NOTE: conditions are optional!
         # <PROPERTY: `listeners[i].rules.conditions`>
-        conditions          = optional(list(object({
+        # 
+        condition           = optional(object({
           host_header       = optional(object({
             values          = list(string)
           }), null)
           path_pattern      = optional(object({
             values          = list(string)
-          }), {
-            values          = [ "*" ]
-          })
-        })), [{
+          }), null)
+        }), {
           # <DEFAULT VALUES: `listeners[i].rules.conditions`>
           path_pattern      = {
             values          = [ "*" ]
           }
           host_header       = null
           # </DEFAULT VALUES: `listeners[i].rules.conditions`>
-        }])
+        })
         # </PROPERTY: `listeners[i].rules.conditions`>
       })), [{
         # <DEFAULT VALUES>
         type                = "forward"
         target_group_index  = 0
-        conditions          = [{
+        condition           = {
           path_pattern      = {
             values          = [ "*" ]
           }
           host_header       = null
-        }]
+        }
         # </DEFAULT VALUES>
       }])
     })), [])
