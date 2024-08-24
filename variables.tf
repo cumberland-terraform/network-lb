@@ -60,15 +60,17 @@ variable "lb" {
         # <PROPERTY: `listeners[i].rules.conditions`>
         conditions          = optional(list(object({
           host_header       = optional(object({
-            values          = list
+            values          = list(string)
           }), null)
           path_pattern      = optional(object({
-            values          = list
-          }), null)
+            values          = list(string)
+          }), {
+            values          = [ "*" ]
+          })
         })), [{
           # <DEFAULT VALUES: `listeners[i].rules.conditions`>
           path_pattern      = {
-            values          = "*"
+            values          = [ "*" ]
           }
           # </DEFAULT VALUES: `listeners[i].rules.conditions`>
         }])
@@ -79,7 +81,7 @@ variable "lb" {
         target_group_index  = 0
         conditions          = [{
           path_pattern      = {
-            values          = "*"
+            values          = [ "*" ]
           }
         }]
         # </DEFAULT VALUES>
