@@ -56,7 +56,8 @@ variable "lb" {
         protocol            = optional(string, "HTTPS")
         status_code         = optional(string, "HTTP_301")
         query               = optional(string, "#{query}")
-        # NOTE: conditions are optional!
+        # NOTE: Only one condition can be specified! 
+        #       All of the others must be null!
         # <PROPERTY: `listeners[i].rules.conditions`>
         # 
         condition           = optional(object({
