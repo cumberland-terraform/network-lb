@@ -58,7 +58,7 @@ resource "aws_lb_target_group" "this" {
       ignore_changes                = [ tags ]
     }
     
-    name                            = lower(join("-", [
+    name                            = upper(join("-", [
                                         module.platform.prefixes.network.lb.target_group,
                                         var.lb.suffix,
                                         "0${each.key}"
