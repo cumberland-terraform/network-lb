@@ -6,9 +6,7 @@ variable "platform" {
     acct_env                = string
     agency                  = string
     program                 = string
-    app                     = string
     app_env                 = string
-    domain                  = string
     availability_zones      = list(string)
     pca                     = string
     subnet_type             = optional(string, "PRIVATE")
