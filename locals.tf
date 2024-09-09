@@ -21,8 +21,10 @@ locals {
     
     ## CALCULATED PROPERTIES
     #   Properties that change based on deployment configurations
+    prefix                              = var.lb.load_balancer_type == "application" ? "ALB" : "NLB"
     lb                                  = {
-        name                            = lower(join("-",[
+        name                            = upper(join("-",[
+                                            local.prefix,
                                             module.platform.prefixes.network.lb.name,
                                             var.lb.suffix
                                         ]))
