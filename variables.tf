@@ -1,7 +1,6 @@
 variable "platform" {
   description               = "Platform metadata configuration object. See [Platform Module] (https://source.mdthink.maryland.gov/projects/etm/repos/mdt-eter-platform/browse) for detailed information about the permitted values for each field."
   type                      = object({
-    aws_region              = string 
     account                 = string
     acct_env                = string
     agency                  = string
@@ -9,6 +8,9 @@ variable "platform" {
     app_env                 = string
     availability_zones      = list(string)
     pca                     = string
+    app                     = optional(string, null)
+    aws_region              = optional(string, "US EAST 1")
+    domain                  = optional(string, null)
     subnet_type             = optional(string, "PRIVATE")
   })
 }
