@@ -97,6 +97,7 @@ variable "lb" {
       health_check          = optional(object({
         path                = optional(string, "/")
         port                = optional(string, "traffic-port")
+        protocol            = optional(string, "HTTP")
         healthy_threshold   = optional(number, 6)
         unhealthy_threshold = optional(number, 2)
         timeout             = optional(number, 3)
@@ -105,6 +106,7 @@ variable "lb" {
       }), {
         path                = "/"
         port                = "traffic-port"
+        protocol            = "HTTP"
         healthy_threshold   = 6
         unhealthy_threshold = 2
         timeout             = 3
