@@ -55,7 +55,6 @@ resource "aws_lb_target_group" "this" {
                                         index => target_group }
 
     lifecycle {
-        create_before_destroy       = true
         ignore_changes              = [ tags ]
     }
     
