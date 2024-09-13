@@ -55,7 +55,8 @@ resource "aws_lb_target_group" "this" {
                                         index => target_group }
 
     lifecycle {
-      ignore_changes                = [ tags ]
+        create_before_destroy       = true
+        ignore_changes              = [ tags ]
     }
     
     name                            = upper(join("-", [
