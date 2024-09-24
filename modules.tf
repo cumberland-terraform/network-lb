@@ -1,5 +1,5 @@
 module "platform" {
-  source                = "git::ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-platform.git?ref=v1.0.13&depth=1"
+  source                = "git::ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-platform.git?ref=v1.0.15"
 
   platform              = local.platform
   hydration             = {
