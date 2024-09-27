@@ -1,6 +1,6 @@
 resource "aws_lb" "this" {
     lifecycle {
-      ignore_changes                = [ tags  ]
+      ignore_changes                = [ tags, name ]
     }
 
     enable_deletion_protection      = local.platform_defaults.lb.enable_deletion_protection
@@ -55,7 +55,7 @@ resource "aws_lb_target_group" "this" {
                                         index => target_group }
 
     lifecycle {
-        ignore_changes              = [ tags ]
+        ignore_changes              = [ tags, name ]
     }
     
     name                            = upper(join("-", [
