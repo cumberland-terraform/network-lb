@@ -5,12 +5,13 @@ pipeline {
 	
 	environment { 
 		BITBUCKET_KEY 				= credentials('mdtjenkinsbgit')
-		EMAIL_LIST 					= 'grant.moore@maryland.gov,aaron.ramirez@maryland.gov'
+		EMAIL_LIST 					= 'grant.moore@maryland.gov,aaron.ramirez@maryland.gov,aasritha.kilari@maryland.gov,'
 		MODULE_NAME 				= 'lb'
 		OS_ARCH 					= 'amd64' 
 		TF_LOG 						= 'WARN'
 		TF_VER 						= '1.8.5'
 	}
+
 	stages {
 		stage('Credentials') {
 			steps {
@@ -24,20 +25,34 @@ pipeline {
 			}
 		}
 
-		stage ('Dependencies') {
-			steps {
+		stage ('Base Dependencies') {
+			steps{
 				sh '''
 					wget -q https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_${OS_ARCH}.zip
         			unzip -o terraform_${TF_VER}_linux_${OS_ARCH}.zip
         			sudo cp -rf terraform /usr/local/bin/
         			terraform --version
+				'''
+			}
+		}
 
+		stage ('Feature Branch Dependencies') {
+			when { expression {env.GIT_BRANCH =~ "origin/feature/*" } }
+			steps {
+				sh '''
 					curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 					tflint --version
 
 					curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
 					tfsec --version
+				'''
+			}
+		}
 
+		stage ('Master Branch Dependencies') {
+			when { expression {env.GIT_BRANCH =~ "origin/master/*" } }
+			steps {
+				sh '''
 					curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.18.0/terraform-docs-v0.18.0-$(uname)-amd64.tar.gz
 					tar -xzf terraform-docs.tar.gz
 					chmod +x terraform-docs
@@ -53,6 +68,7 @@ pipeline {
 		issues are found. ONLY DURING INITIAL DEV
 		*/
 		stage ('Lint') {
+			when { expression {env.GIT_BRANCH =~ "origin/feature/*" } }
 			steps {
 				sh '''
 					tflint \
@@ -68,6 +84,7 @@ pipeline {
 		}
 
 		stage ('Sec Scanning') {
+			when { expression {env.GIT_BRANCH =~ "origin/feature/*" } }
 		    steps {
 				sh '''
 				    tfsec . \
@@ -82,6 +99,7 @@ pipeline {
 		}
 
 		stage ('Test') {
+			when { expression {env.GIT_BRANCH =~ "origin/feature/*" } }
 			steps {
 				sh '''
 					terraform init \
@@ -93,8 +111,9 @@ pipeline {
 				'''
 			}
 		}
-
+		
 		stage ('Document') {
+			when { expression {env.GIT_BRANCH =~ "origin/master/*" } }
 			steps {
 				sh '''
 					terraform-docs \
