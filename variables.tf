@@ -21,6 +21,7 @@ variable "lb" {
     load_balancer_type      = optional(string, "application")
     security_groups         = optional(list(string), [])
 
+    # <PROPERTY: `listeners`>
     listeners               = optional(list(object({
       port                  = number
       protocol              = string
@@ -86,9 +87,11 @@ variable "lb" {
         }]
         # </DEFAULT VALUES>
       }])
+        # </PROPERTY: `listeners[i].rules`>
     })), [])
-    # </PROPERTY: `listeners[i].rules`>
-    # <PROPERTY: `listeners[i].target_groups`>
+    # </PROPERTY: `listeners`>
+
+    # <PROPERTY: `target_groups`>
     target_groups           = list(object({
       port                  = number
       protocol              = string
@@ -114,7 +117,7 @@ variable "lb" {
         matcher             = "200-299"
       })
     }))
-    # <PROPERTY: `listeners[i].target_groups`>
+    # <PROPERTY: `target_groups`>
     suffix                  = optional(string, "web")
   })
 }
