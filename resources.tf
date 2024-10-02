@@ -19,7 +19,7 @@ resource "aws_lb_listener" "this" {
     load_balancer_arn               = aws_lb.this.arn
     port                            = each.value.port
     protocol                        = each.value.protocol
-    ssl_policy                      = each.value.certificate_arn != null ? (
+    ssl_policy                      = length(each.value.certificate_arns) > 0 ? (
                                         local.platform_defaults.listener.ssl_policy
                                     ) : null
     # NOTE: first certificate in list becomes default certificate. the rest get mapped
