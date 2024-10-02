@@ -53,7 +53,7 @@ resource "aws_lb_listener" "this" {
 }
 
 resource "aws_lb_listener_certificate" "this" {
-    for_each                        = { for index, certificate in local.local.listener_certificates: 
+    for_each                        = { for index, certificate in local.listener_certificates: 
                                         index => certificate }
 
     listener_arn                    = aws_lb_listener.this[each.value.l_index].arn
