@@ -55,6 +55,17 @@ locals {
             } 
         ]
     ])
+
+    ## CERTIFICATE MAPPING
+    listener_certificates               = flatten([
+        for l_index, listener in var.lb.listeners: [
+            for c_index, certificate_arn in listener.certificate_arns: {
+                listener_index          = l_index
+                certificate_arn         = certificate_arn
+            }
+        ]
+    ])
+    
     # NOTE: The `target_group.target_id` attribute has to be made optional and then filtered
     #           on null values for this reason: when deploying ECS services, the attachment
     #           of containers to target groups is handled on the AWS side. However, the target

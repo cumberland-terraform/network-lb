@@ -22,7 +22,9 @@ resource "aws_lb_listener" "this" {
     ssl_policy                      = each.value.certificate_arn != null ? (
                                         local.platform_defaults.listener.ssl_policy
                                     ) : null
-    certificate_arn                 = each.value.certificate_arn
+    # NOTE: first certificate in list becomes default certificate. the rest get mapped
+    #       through `aws_lb_listener_certificate` resource.
+    certificate_arn                 = try(each.value.certificate_arns[0], null)
 
     default_action {
         type                        = each.value.default_action.type
@@ -48,6 +50,14 @@ resource "aws_lb_listener" "this" {
             }
         }
     }
+}
+
+resource "aws_lb_listener_certificate" "this" {
+    for_each                        = { for index, certificate in local.local.listener_certificates: 
+                                        index => certificate }
+
+    listener_arn                    = aws_lb_listener.this[each.value.l_index].arn
+    certificate_arn                 = each.value.certificate_arn
 }
 
 resource "aws_lb_target_group" "this" {

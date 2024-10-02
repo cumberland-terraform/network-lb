@@ -24,7 +24,7 @@ variable "lb" {
     listeners               = optional(list(object({
       port                  = number
       protocol              = string
-      certificate_arn       = optional(string, null)
+      certificate_arns      = optional(list(string), [])
       # <PROPERTY: `listeners[i].default_action`>
       default_action        = optional(object({
         type                = optional(string, "forward")
