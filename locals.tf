@@ -49,12 +49,12 @@ locals {
     #       of this module. Access policy needs to know the ARN of the bucket, so have to force the name
     #       at this level, rather than letting it get set by S3 module, in order to prevent an infinite
     #       cycle.
-    bucket_name                         = lower(join(
+    bucket_name                         = lower(join("-",[
                                             "s3",
                                             module.platform.prefixes.network.lb.name,
                                             var.lb.suffix,
                                             "logs"
-                                        ))
+                                        ]))
     log_bucket                          = local.conditions.provision_log_bucket ? {
         name_override                   = local.bucket_name
         purpose                         = "Log bucket for ${local.lb.name} load balancer"
