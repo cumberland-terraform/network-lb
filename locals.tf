@@ -61,6 +61,7 @@ locals {
         kms_key                         = local.kms_key
         versioning                      = false
         policy                          = try(data.aws_iam_policy_document.log_access_policy[0].json, null)
+        public_access_block             = false
     }
 
     platform                            = merge({
