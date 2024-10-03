@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "log_access_policy" {
                                     "arn:aws:s3:::${local.bucket_name}/*",
                                     "arn:aws:s3:::${local.bucket_name}/AWSLogs/${module.platform.aws.account_id}/*",
                                     "arn:aws:s3:::${local.bucket_name}/${var.lb.connection_logs.prefix}/AWSLogs/${module.platform.aws.account_id}/*",
-                                    "arn:aws:s3:::${local.bucket_name}${var.lb.access_logs.prefix}/AWSLogs/${module.platform.aws.account_id}/*"
+                                    "arn:aws:s3:::${local.bucket_name}/${var.lb.access_logs.prefix}/AWSLogs/${module.platform.aws.account_id}/*"
                                 ]
         
         principals {
