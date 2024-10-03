@@ -17,9 +17,9 @@ resource "aws_lb" "this" {
                                     ) : toset([])
 
         content {
-            enabled                 = var.lb.access_log.enabled
+            enabled                 = var.lb.access_logs.enabled
             bucket                  = module.log_bucket[0].bucket[0].id
-            prefix                  = var.lb.access_log.prefix
+            prefix                  = var.lb.access_logs.prefix
         }
     }
 

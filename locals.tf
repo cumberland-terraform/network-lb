@@ -47,6 +47,7 @@ locals {
     platform                            = merge({
 
     }, var.platform)
+    
     tags                                = merge({
 
     }, module.platform.tags)
