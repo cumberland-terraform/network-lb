@@ -24,12 +24,6 @@ locals {
     ## CALCULATED PROPERTIES
     #   Properties that change based on deployment configurations
     prefix                              = var.lb.load_balancer_type == "application" ? "ALB" : "NLB"
-
-    kms_key                             = local.conditions.provision_key ? (
-                                            module.kms[0].key
-                                        ) : !var.lb.kms_key.aws_managed ? ( 
-                                            var.lb.kms_key
-                                        ): null
                                         
     lb                                  = {
         name                            = upper(join("-",[
@@ -58,7 +52,9 @@ locals {
     log_bucket                          = {
         name_override                   = local.bucket_name
         purpose                         = "Log bucket for ${local.lb.name} load balancer"
-        kms_key                         = local.kms_key
+        kms_key                         = {
+            aws_managed                 = true
+        }
         versioning                      = false
         policy                          = try(data.aws_iam_policy_document.log_access_policy[0].json, null)
         public_access_block             = false
