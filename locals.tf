@@ -45,12 +45,23 @@ locals {
                                         )
     }
 
-    log_bucket                          = {
-        suffix                          = var.lb.suffix
+    # NOTE: have to override log bucket name, because the access policy has to be defined at the level
+    #       of this module. Access policy needs to know the ARN of the bucket, so have to force the name
+    #       at this level, rather than letting it get set by S3 module, in order to prevent an infinite
+    #       cycle.
+    bucket_name                         = lower(join(
+                                            "s3",
+                                            module.platform.prefixes.network.lb.name,
+                                            var.lb.suffix,
+                                            "logs"
+                                        ))
+    log_bucket                          = local.conditions.provision_log_bucket ? {
+        name_override                   = local.bucket_name
         purpose                         = "Log bucket for ${local.lb.name} load balancer"
         kms_key                         = local.kms_key
         versioning                      = false
-    }
+        policy                          = data.aws_iam_policy_document.log_access_policy[0].json
+    } : { }
 
     platform                            = merge({
         # TODO: LB specific properties
