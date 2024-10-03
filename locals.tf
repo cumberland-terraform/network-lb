@@ -25,6 +25,12 @@ locals {
     #   Properties that change based on deployment configurations
     prefix                              = var.lb.load_balancer_type == "application" ? "ALB" : "NLB"
 
+    kms_key                             = local.conditions.provision_key ? (
+                                            module.kms[0].key
+                                        ) : !var.lb.kms_key.aws_managed ? ( 
+                                            var.lb.kms_key
+                                        ): null
+                                        
     lb                                  = {
         name                            = upper(join("-",[
                                             local.prefix,
@@ -40,16 +46,17 @@ locals {
     }
 
     log_bucket                          = {
-        suffix                              =  module.platform.prefixes.network.lb.name
-        purpose                             = "Log bucket for ${local.lb.name} load balancer"
+        suffix                          =  module.platform.prefixes.network.lb.name
+        purpose                         = "Log bucket for ${local.lb.name} load balancer"
+        kms_key                         = local.kms_key
     }
 
     platform                            = merge({
-
+        # TODO: LB specific properties
     }, var.platform)
-    
-    tags                                = merge({
 
+    tags                                = merge({
+        # TODO: LB specific tags
     }, module.platform.tags)
 
     ## LISTENER-RULE MAPPING
