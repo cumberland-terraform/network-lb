@@ -10,6 +10,31 @@ resource "aws_lb" "this" {
     security_groups                 = local.lb.security_groups
     subnets                         = module.platform.network.subnets.ids
     tags                            = local.tags
+
+    dynamic "access_logs" {
+        for_each                    = var.lb.access_logs.enabled ? (
+                                        toset([1])
+                                    ) : toset([])
+
+        content {
+            enabled                 = var.lb.access_log.enabled
+            bucket                  = module.log_bucket[0].bucket[0].id
+            prefix                  = var.lb.access_log.prefix
+        }
+    }
+
+    dynamic "connection_logs" {
+        for_each                    = var.lb.connection_logs.enabled ? (
+                                        toset([1])
+                                    ) : toset([])
+        
+        content {
+            enabled                 = var.lb.connection_logs.enabled
+            bucket                  = module.log_bucket[0].bucket[0].id
+            prefix                  = var.lb.connection_logs.prefix
+        }
+    }
+    
 }
 
 resource "aws_lb_listener" "this" {
@@ -48,30 +73,6 @@ resource "aws_lb_listener" "this" {
                 status_code         = each.value.default_action.status_code
                 query               = each.value.default_action.query
             }
-        }
-    }
-
-    dynamic "access_logs" {
-        for_each                    = var.s3.access_logs.enabled ? (
-                                        toset([1])
-                                    ) : toset([])
-
-        content {
-            enabled                 = var.lb.access_log.enabled
-            bucket                  = module.log_bucket[0].bucket[0].id
-            prefix                  = var.lb.access_log.prefix
-        }
-    }
-
-    dynamic "connection_logs" {
-        for_each                    = var.lb.connection_logs.enabled ? (
-                                        toset([1])
-                                    ) : toset([])
-        
-        content {
-            enabled                 = var.lb.connection_logs.enabled
-            bucket                  = module.log_bucket[0].bucket[0].id
-            prefix                  = var.lb.connection_logs.prefix
         }
     }
 }
