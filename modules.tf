@@ -11,6 +11,16 @@ module "platform" {
   }
 }
 
+module "kms" {
+  count                 = local.conditions.provision_key ? 1 : 0
+  source                = "git::ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-core-security-kms.git?ref=v1.0.2"
+
+  kms            = {
+      alias_suffix      = "LB"
+  }
+  platform              = var.platform
+}
+
 module "log_bucket" {
   count                 = local.conditions.provision_log_bucket ? 1 : 0
 

@@ -3,7 +3,9 @@ locals {
     #   Configuration object containing boolean calculations that correspond
     #       to different deployment configurations.
     conditions                          = {
-        provision_connection_log_bucket = var.connection_logs.enabled || var.access_logs.enabled
+        provision_connection_log_bucket = var.lb.connection_logs.enabled || var.lb.access_logs.enabled
+        provision_key                   = var.lb.kms_key == null
+
     }
 
     ## LOAD BALANCER DEFAULTS

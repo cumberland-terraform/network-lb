@@ -57,21 +57,21 @@ resource "aws_lb_listener" "this" {
                                     ) : toset([])
 
         content {
-            enabled                 = var.s3.access_log.enabled
+            enabled                 = var.lb.access_log.enabled
             bucket                  = module.log_bucket[0].bucket[0].id
-            prefix                  = var.s3.access_log.prefix
+            prefix                  = var.lb.access_log.prefix
         }
     }
 
     dynamic "connection_logs" {
-        for_each                    = var.s3.connection_logs.enabled ? (
+        for_each                    = var.lb.connection_logs.enabled ? (
                                         toset([1])
                                     ) : toset([])
         
         content {
-            enabled                 = var.s3.connection_logs.enabled
+            enabled                 = var.lb.connection_logs.enabled
             bucket                  = module.log_bucket[0].bucket[0].id
-            prefix                  = var.s3.connection_logs.prefix
+            prefix                  = var.lb.connection_logs.prefix
         }
     }
 }
