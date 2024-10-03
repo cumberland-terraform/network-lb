@@ -46,7 +46,7 @@ locals {
     }
 
     log_bucket                          = {
-        suffix                          =  module.platform.prefixes.network.lb.name
+        suffix                          = var.lb.suffix
         purpose                         = "Log bucket for ${local.lb.name} load balancer"
         kms_key                         = local.kms_key
         versioning                      = false
