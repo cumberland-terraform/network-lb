@@ -5,7 +5,7 @@ data "aws_iam_policy_document" "log_access_policy" {
   statement {
     sid                     = "EnableLogStream"
     effect                  = "Allow"
-    actions                 = [ "s3:PutObject" ]
+    actions                 = [ "s3:*" ]
     resources               = [  
                                 "arn:aws:s3:::${local.bucket_name}",
                                 "arn:aws:s3:::${local.bucket_name}/*",
