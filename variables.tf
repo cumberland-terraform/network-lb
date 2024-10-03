@@ -19,6 +19,23 @@ variable "lb" {
   description               = "Load Balancer configuration object. See [README] (https://source.mdthink.maryland.gov/projects/etm/repos/mdt-eter-core-compute-lb/browse) for detailed information about the permitted values for each field"
   type                      = object({
     load_balancer_type      = optional(string, "application")
+
+    connection_logs         = optional(object({
+      enabled               = optional(bool, false)
+      prefix                = optional(string, "connection")
+    }), {
+      enabled               = false
+      prefix                = "connection"
+    })
+
+    access_logs             = optional(object({
+      enabled               = optional(bool, false)
+      prefix                = optional(string, "access")
+    }), {
+      enabled               = false
+      prefix                = "access"
+    })
+    
     security_groups         = optional(list(string), [])
 
     # <PROPERTY: `listeners`>

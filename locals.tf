@@ -3,7 +3,7 @@ locals {
     #   Configuration object containing boolean calculations that correspond
     #       to different deployment configurations.
     conditions                          = {
-        # TODO: conditional calculations go here
+        provision_connection_log_bucket = var.connection_logs.enabled || var.access_logs.enabled
     }
 
     ## LOAD BALANCER DEFAULTS
@@ -22,6 +22,7 @@ locals {
     ## CALCULATED PROPERTIES
     #   Properties that change based on deployment configurations
     prefix                              = var.lb.load_balancer_type == "application" ? "ALB" : "NLB"
+
     lb                                  = {
         name                            = upper(join("-",[
                                             local.prefix,
@@ -35,6 +36,12 @@ locals {
                                             ]
                                         )
     }
+
+    log_bucket                          = {
+        suffix                              =  module.platform.prefixes.network.lb.name
+        purpose                             = "Log bucket for ${local.lb.name} load balancer"
+    }
+
     platform                            = merge({
 
     }, var.platform)

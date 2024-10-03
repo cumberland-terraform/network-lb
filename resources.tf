@@ -50,6 +50,30 @@ resource "aws_lb_listener" "this" {
             }
         }
     }
+
+    dynamic "access_logs" {
+        for_each                    = var.s3.access_logs.enabled ? (
+                                        toset([1])
+                                    ) : toset([])
+
+        content {
+            enabled                 = var.s3.access_log.enabled
+            bucket                  = module.log_bucket[0].bucket[0].id
+            prefix                  = var.s3.access_log.prefix
+        }
+    }
+
+    dynamic "connection_logs" {
+        for_each                    = var.s3.connection_logs.enabled ? (
+                                        toset([1])
+                                    ) : toset([])
+        
+        content {
+            enabled                 = var.s3.connection_logs.enabled
+            bucket                  = module.log_bucket[0].bucket[0].id
+            prefix                  = var.s3.connection_logs.prefix
+        }
+    }
 }
 
 resource "aws_lb_listener_certificate" "this" {
