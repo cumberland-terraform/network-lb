@@ -37,7 +37,7 @@ pipeline {
 		}
 
 		stage ('Feature Branch Dependencies') {
-			when { expression {env.GIT_BRANCH =~ "origin/feature/*" } }
+			when { expression {env.GIT_BRANCH =~ "origin/feature/*" || env.GIT_BRANCH =~ "origin/*PR*" || env.GIT_BRANCH =~ "origin/*PR*" } }
 			steps {
 				sh '''
 					curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
@@ -68,7 +68,7 @@ pipeline {
 		issues are found. ONLY DURING INITIAL DEV
 		*/
 		stage ('Lint') {
-			when { expression {env.GIT_BRANCH =~ "origin/feature/*" } }
+			when { expression {env.GIT_BRANCH =~ "origin/feature/*" || env.GIT_BRANCH =~ "origin/*PR*" || env.GIT_BRANCH =~ "origin/*PR*" } }
 			steps {
 				sh '''
 					tflint \
@@ -84,7 +84,7 @@ pipeline {
 		}
 
 		stage ('Sec Scanning') {
-			when { expression {env.GIT_BRANCH =~ "origin/feature/*" } }
+			when { expression {env.GIT_BRANCH =~ "origin/feature/*" || env.GIT_BRANCH =~ "origin/*PR*" || env.GIT_BRANCH =~ "origin/*PR*" } }
 		    steps {
 				sh '''
 				    tfsec . \
@@ -99,7 +99,7 @@ pipeline {
 		}
 
 		stage ('Test') {
-			when { expression {env.GIT_BRANCH =~ "origin/feature/*" } }
+			when { expression {env.GIT_BRANCH =~ "origin/feature/*" || env.GIT_BRANCH =~ "origin/*PR*" || env.GIT_BRANCH =~ "origin/*PR*" } }
 			steps {
 				sh '''
 					terraform init \
