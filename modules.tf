@@ -27,5 +27,5 @@ module "log_bucket" {
   source                = "git::ssh://mdt.global@source.mdthink.maryland.gov:22/etm/mdt-eter-core-storage-s3.git?depth=1"
 
   platform              = local.platform
-  s3                    = each.value
+  s3                    = local.log_bucket
 }
