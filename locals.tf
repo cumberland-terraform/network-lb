@@ -55,13 +55,13 @@ locals {
                                             var.lb.suffix,
                                             "logs"
                                         ]))
-    log_bucket                          = local.conditions.provision_log_bucket ? {
+    log_bucket                          = {
         name_override                   = local.bucket_name
         purpose                         = "Log bucket for ${local.lb.name} load balancer"
         kms_key                         = local.kms_key
         versioning                      = false
-        policy                          = data.aws_iam_policy_document.log_access_policy[0].json
-    } : { }
+        policy                          = try(data.aws_iam_policy_document.log_access_policy[0].json, null)
+    }
 
     platform                            = merge({
         # TODO: LB specific properties
