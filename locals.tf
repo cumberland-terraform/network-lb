@@ -49,6 +49,7 @@ locals {
         suffix                          =  module.platform.prefixes.network.lb.name
         purpose                         = "Log bucket for ${local.lb.name} load balancer"
         kms_key                         = local.kms_key
+        versioning                      = false
     }
 
     platform                            = merge({
