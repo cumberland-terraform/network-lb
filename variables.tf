@@ -19,12 +19,37 @@ variable "lb" {
   description               = "Load Balancer configuration object. See [README] (https://source.mdthink.maryland.gov/projects/etm/repos/mdt-eter-core-compute-lb/browse) for detailed information about the permitted values for each field"
   type                      = object({
     load_balancer_type      = optional(string, "application")
+
+    connection_logs         = optional(object({
+      enabled               = optional(bool, false)
+      prefix                = optional(string, "connection")
+    }), {
+      enabled               = false
+      prefix                = "connection"
+    })
+
+    access_logs             = optional(object({
+      enabled               = optional(bool, false)
+      prefix                = optional(string, "access")
+    }), {
+      enabled               = false
+      prefix                = "access"
+    })
+
+    kms_key                 = optional(object({
+      aws_managed           = optional(bool, false)
+      id                    = optional(string, null)
+      arn                   = optional(string, null)
+      alias_arn             = optional(string, null)
+    }), null)
+
     security_groups         = optional(list(string), [])
 
+    # <PROPERTY: `listeners`>
     listeners               = optional(list(object({
       port                  = number
       protocol              = string
-      certificate_arn       = optional(string, null)
+      certificate_arns      = optional(list(string), [])
       # <PROPERTY: `listeners[i].default_action`>
       default_action        = optional(object({
         type                = optional(string, "forward")
@@ -86,9 +111,11 @@ variable "lb" {
         }]
         # </DEFAULT VALUES>
       }])
+        # </PROPERTY: `listeners[i].rules`>
     })), [])
-    # </PROPERTY: `listeners[i].rules`>
-    # <PROPERTY: `listeners[i].target_groups`>
+    # </PROPERTY: `listeners`>
+
+    # <PROPERTY: `target_groups`>
     target_groups           = list(object({
       port                  = number
       protocol              = string
@@ -114,7 +141,7 @@ variable "lb" {
         matcher             = "200-299"
       })
     }))
-    # <PROPERTY: `listeners[i].target_groups`>
+    # <PROPERTY: `target_groups`>
     suffix                  = optional(string, "web")
   })
 }

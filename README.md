@@ -67,7 +67,7 @@ Module input are organized through the `lb` variable. The following bullet-point
 - `listeners`: *Optional*. A list of listener objects to associate with the load balancer. Technically optional, as the module can still be used without specifying any listeners, but it is not very useful without them.
         - `port`: *Required*. Port on which the listener listens.
         - `protocol`: *Required*. Protocol on which the listener listens.
-        - `certificate_arn`: *Optional*. Certificate ARN of the SSL/TLS certificate for the listener. Required if listener is listening on port 443. 
+        - `certificate_arns`: *Optional*. List of certificate ARNs of the SSL/TLS certificate for the listener. Required if listener is listening on port 443. The first certificate in the list becomes the default SSL certificate. The other certificates are mapped to the listeners through extra certificate associations.
         - `default_action`: *Optional*. Default action listener should apply to incoming requests. Defaults to forwarding to the first target group.
                 - `type`: Defaults to `forward`.
                 - `target_group_index`: Index of the Target Group to which the rule will apply its action. Defaults to `0`

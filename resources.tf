@@ -10,6 +10,31 @@ resource "aws_lb" "this" {
     security_groups                 = local.lb.security_groups
     subnets                         = module.platform.network.subnets.ids
     tags                            = local.tags
+
+    dynamic "access_logs" {
+        for_each                    = var.lb.access_logs.enabled ? (
+                                        toset([1])
+                                    ) : toset([])
+
+        content {
+            enabled                 = var.lb.access_logs.enabled
+            bucket                  = module.log_bucket[0].bucket[0].id
+            prefix                  = var.lb.access_logs.prefix
+        }
+    }
+
+    dynamic "connection_logs" {
+        for_each                    = var.lb.connection_logs.enabled ? (
+                                        toset([1])
+                                    ) : toset([])
+        
+        content {
+            enabled                 = var.lb.connection_logs.enabled
+            bucket                  = module.log_bucket[0].bucket[0].id
+            prefix                  = var.lb.connection_logs.prefix
+        }
+    }
+    
 }
 
 resource "aws_lb_listener" "this" {
@@ -19,10 +44,12 @@ resource "aws_lb_listener" "this" {
     load_balancer_arn               = aws_lb.this.arn
     port                            = each.value.port
     protocol                        = each.value.protocol
-    ssl_policy                      = each.value.certificate_arn != null ? (
+    ssl_policy                      = length(each.value.certificate_arns) > 0 ? (
                                         local.platform_defaults.listener.ssl_policy
                                     ) : null
-    certificate_arn                 = each.value.certificate_arn
+    # NOTE: first certificate in list becomes default certificate. the rest get mapped
+    #       through `aws_lb_listener_certificate` resource.
+    certificate_arn                 = try(each.value.certificate_arns[0], null)
 
     default_action {
         type                        = each.value.default_action.type
@@ -48,6 +75,14 @@ resource "aws_lb_listener" "this" {
             }
         }
     }
+}
+
+resource "aws_lb_listener_certificate" "this" {
+    for_each                        = { for index, certificate in local.listener_certificates: 
+                                        index => certificate }
+
+    listener_arn                    = aws_lb_listener.this[each.value.listener_index].arn
+    certificate_arn                 = each.value.certificate_arn
 }
 
 resource "aws_lb_target_group" "this" {
