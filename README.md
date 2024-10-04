@@ -12,6 +12,21 @@ This is the Terraform Module for MDTHINK Platform compliant load balancers.
 
 An ALB deployment can be achieved with the following configuration,
 
+**providers.tf**
+
+```hcl
+provider "aws" {
+	alias 					= "tenant"
+	region					= "us-east-1"
+
+	assume_role {
+		role_arn 			= "arn:aws:iam::<tenant-account>:role/<role-name>"
+	}
+}
+```
+
+**modules.tf**
+
 ```
 module "lb" {
 	source          		= "ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-aws-core-compute-lb.git"
@@ -149,46 +164,96 @@ The `var.lb.target_groups.*.target_id` attribute has to be made optional and all
 
 ## Contributing
 
-Checkout master and pull the latest commits,
+The below instructions are to be performed within Unix-style terminal. 
+
+It is recommended to use Git Bash if using a Windows machine. Installation and setup of Git Bash can be found [here](https://git-scm.com/downloads/win)
+
+### Step 1: Clone Repo
+
+Clone the repository. Details on the cloning process can be found [here](https://support.atlassian.com/bitbucket-cloud/docs/clone-a-git-repository/)
+
+If the repository is already cloned, ensure it is up to date with the following commands,
 
 ```bash
 git checkout master
 git pull
 ```
 
-Append ``feature/`` to all new branches.
+### Step 2: Create Branch
+
+Create a branch from the `master` branch. The branch name should be formatted as follows:
+
+	feature/<TICKET_NUMBER>
+
+Where the value of `<TICKET_NUMBER>` is the ticket for which your work is associated. 
+
+The basic command for creating a branch is as follows:
 
 ```bash
-git checkout -b feature/newthing
+git checkout -b feature/<TICKET_NUMBER>
 ```
 
-After committing your changes, push them to your feature branch and then merge them into the `test` branch. 
+For more information, refer to the documentation [here](https://docs.gitlab.com/ee/tutorials/make_first_git_commit/#create-a-branch-and-make-changes)
+
+### Step 3: Commit Changes
+
+Update the code and commit the changes,
 
 ```bash
-git checkout test && git merge feature/newthing
+git commit -am "<TICKET_NUMBER> - description of changes"
 ```
 
-Once the changes are in the `test` branch, the Jenkins job containing the unit tests, linting and security scans can be run. Once the tests are passing, tag the latest commit,
+More information on commits can be found in the documentation [here](https://docs.gitlab.com/ee/tutorials/make_first_git_commit/#commit-and-push-your-changes)
+
+### Step 4: Merge With Master On Local
+
+
+```bash
+git checkout master
+git pull
+git checkout feature/<TICKET_NUMBER>
+git merge master
+```
+
+For more information, see [git documentation](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)
+
+
+### Step 5: Push Branch to Remote
+
+After committing changes, push the branch to the remote repository,
+
+```bash
+git push origin feature/<TICKET_NUMBER>
+```
+
+### Step 6: Pull Request
+
+Create a pull request. More information on this can be found [here](https://www.atlassian.com/git/tutorials/making-a-pull-request).
+
+Once the pull request is opened, a pipeline will kick off and execute a series of quality gates for linting, security scanning and testing tasks.
+
+### Step 7: Merge
+
+After the pipeline successfully validates the code and the Pull Request has been approved, merge the Pull Request in `master`.
+
+After the code changes are in master, the new version should be tagged. To apply a tag, the following commands can be executed,
 
 ```bash
 git tag v1.0.1
+git push tag v1.0.1
 ```
 
-Once the commit has been tagged, a PR can be made from the `test` branch into the `master` branch.
+Update the `CHANGELOG.md` with information about changes.
 
 ### Pull Request Checklist
 
-Ensure each item on the following checklist is complete before updating any tenant deployments with a new version of the ``mdt-eter-core-compute-lb`` module,
+Ensure each item on the following checklist is complete before updating any tenant deployments with a new version of this module,
 
-- [] Update Changelog
-- [] Merge into `test` branch
+- [] Merge `master` into `feature/*` branch
+- [] Open PR from `feature/*` branch into `master` branch
 - [] Ensure tests are passing in Jenkins
-- [] Increment `git tag` version
-- [] Open PR from `test` into `master` branch
 - [] Get approval from lead
 - [] Merge into `master`
+- [] Increment `git tag` version
+- [] Update Changelog
 - [] Publish latest version on Confluence
-
-### TODOS
-
-1. Currently, the `mdt-eter-core-compute-lb` module has only been tested for load balancers of type `application`. `network` load balancers should also be supported by this module, but they need to be tested. This will require reworking how the listener rules are generated!
