@@ -237,36 +237,17 @@ git tag v1.0.1
 git push tag v1.0.1
 ```
 
-<<<<<<< HEAD
-The tag number needs to be the next iteration from the modules current version. For example the next version from the above example would be v1.0.2 etc.
-
-=======
 Update the `CHANGELOG.md` with information about changes.
->>>>>>> master
 
 ### Pull Request Checklist
 
 Ensure each item on the following checklist is complete before updating any tenant deployments with a new version of this module,
 
-<<<<<<< HEAD
-- [] Merge `master` into feature branch
-- [] Open PR from feature branch into `master` branch
-=======
 - [] Merge `master` into `feature/*` branch
 - [] Open PR from `feature/*` branch into `master` branch
->>>>>>> master
 - [] Ensure tests are passing in Jenkins
 - [] Get approval from lead
 - [] Merge into `master`
 - [] Increment `git tag` version
 - [] Update Changelog
-<<<<<<< HEAD
 - [] Publish latest version on Confluence
-
-
-### TODOS
-
-1. Currently, the `mdt-eter-core-compute-lb` module has only been tested for load balancers of type `application`. `network` load balancers should also be supported by this module, but they need to be tested. This will require reworking how the listener rules are generated!
-=======
-- [] Publish latest version on Confluence
->>>>>>> master
