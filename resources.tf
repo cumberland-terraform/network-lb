@@ -1,15 +1,41 @@
 resource "aws_lb" "this" {
     lifecycle {
-      ignore_changes                = [ tags  ]
+      ignore_changes                = [ tags, name ]
     }
 
     enable_deletion_protection      = local.platform_defaults.lb.enable_deletion_protection
     internal                        = local.platform_defaults.lb.internal
+    preserve_host_header            = local.platform_defaults.lb.preserve_host_header
     load_balancer_type              = var.lb.load_balancer_type
     name                            = local.lb.name
     security_groups                 = local.lb.security_groups
     subnets                         = module.platform.network.subnets.ids
     tags                            = local.tags
+
+    dynamic "access_logs" {
+        for_each                    = var.lb.access_logs.enabled ? (
+                                        toset([1])
+                                    ) : toset([])
+
+        content {
+            enabled                 = var.lb.access_logs.enabled
+            bucket                  = module.log_bucket[0].bucket[0].id
+            prefix                  = var.lb.access_logs.prefix
+        }
+    }
+
+    dynamic "connection_logs" {
+        for_each                    = var.lb.connection_logs.enabled ? (
+                                        toset([1])
+                                    ) : toset([])
+        
+        content {
+            enabled                 = var.lb.connection_logs.enabled
+            bucket                  = module.log_bucket[0].bucket[0].id
+            prefix                  = var.lb.connection_logs.prefix
+        }
+    }
+    
 }
 
 resource "aws_lb_listener" "this" {
@@ -19,10 +45,12 @@ resource "aws_lb_listener" "this" {
     load_balancer_arn               = aws_lb.this.arn
     port                            = each.value.port
     protocol                        = each.value.protocol
-    ssl_policy                      = each.value.certificate_arn != null ? (
+    ssl_policy                      = length(each.value.certificate_arns) > 0 ? (
                                         local.platform_defaults.listener.ssl_policy
                                     ) : null
-    certificate_arn                 = each.value.certificate_arn
+    # NOTE: first certificate in list becomes default certificate. the rest get mapped
+    #       through `aws_lb_listener_certificate` resource.
+    certificate_arn                 = try(each.value.certificate_arns[0], null)
 
     default_action {
         type                        = each.value.default_action.type
@@ -39,12 +67,23 @@ resource "aws_lb_listener" "this" {
                                     ) : toset([])
 
             content {
+                host                = each.value.default_action.host
+                path                = each.value.default_action.path
                 port                = each.value.default_action.port
                 protocol            = each.value.default_action.protocol
                 status_code         = each.value.default_action.status_code
+                query               = each.value.default_action.query
             }
         }
     }
+}
+
+resource "aws_lb_listener_certificate" "this" {
+    for_each                        = { for index, certificate in local.listener_certificates: 
+                                        index => certificate }
+
+    listener_arn                    = aws_lb_listener.this[each.value.listener_index].arn
+    certificate_arn                 = each.value.certificate_arn
 }
 
 resource "aws_lb_target_group" "this" {
@@ -52,10 +91,10 @@ resource "aws_lb_target_group" "this" {
                                         index => target_group }
 
     lifecycle {
-      ignore_changes                = [ tags ]
+        ignore_changes              = [ tags, name ]
     }
     
-    name                            = lower(join("-", [
+    name                            = upper(join("-", [
                                         module.platform.prefixes.network.lb.target_group,
                                         var.lb.suffix,
                                         "0${each.key}"
@@ -65,6 +104,17 @@ resource "aws_lb_target_group" "this" {
     protocol                        = each.value.protocol
     vpc_id                          = module.platform.network.vpc.id
     tags                            = local.tags
+
+    health_check {
+        path                        = each.value.health_check.path
+        port                        = each.value.health_check.port
+        protocol                    = each.value.health_check.protocol
+        healthy_threshold           = each.value.health_check.healthy_threshold
+        unhealthy_threshold         = each.value.health_check.unhealthy_threshold
+        timeout                     = each.value.health_check.timeout
+        interval                    = each.value.health_check.interval
+        matcher                     = each.value.health_check.matcher
+    }
 }
 
 resource "aws_lb_target_group_attachment" "this" {
@@ -100,17 +150,45 @@ resource "aws_lb_listener_rule" "this" {
                                     ) : toset([])
 
             content {
+                host                = var.lb.listeners[each.value.l_i].rules[each.value.r_i].host
+                path                = var.lb.listeners[each.value.l_i].rules[each.value.r_i].path
                 port                = var.lb.listeners[each.value.l_i].rules[each.value.r_i].port
                 protocol            = var.lb.listeners[each.value.l_i].rules[each.value.r_i].protocol
                 status_code         = var.lb.listeners[each.value.l_i].rules[each.value.r_i].status_code
+                query               = var.lb.listeners[each.value.l_i].rules[each.value.r_i].query
             }
         }
     }
 
-    # TODO: parameterize this block
-    condition {
-        path_pattern {
-            values                  = ["*"]
+    dynamic "condition" {
+        for_each                = { for index, condition in var.lb.listeners[each.value.l_i].rules[each.value.r_i].conditions:
+                                    index => condition }
+
+        content {
+
+            dynamic "host_header" {
+                # NOTE: dynamic block requires an iterable, so iterate over dummy index if rule 
+                #       type is `redirect` in order to generate a redirect rule block.
+                for_each                = condition.value.host_header != null ? (
+                                            toset([1]) 
+                                        ) : toset([])
+                
+                content {
+                    values              = condition.value.host_header.values
+                }
+            }
+
+            dynamic "path_pattern" {
+                # NOTE: dynamic block requires an iterable, so iterate over dummy index if rule 
+                #       type is `redirect` in order to generate a redirect rule block.
+                for_each                = condition.value.path_pattern != null ? (
+                                            toset([1]) 
+                                        ) : toset([])
+                
+                content {
+                    values              = condition.value.path_pattern.values
+                }
+            }
         }
     }
 }

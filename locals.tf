@@ -3,7 +3,9 @@ locals {
     #   Configuration object containing boolean calculations that correspond
     #       to different deployment configurations.
     conditions                          = {
-        # TODO: conditional calculations go here
+        provision_log_bucket            = var.lb.connection_logs.enabled || var.lb.access_logs.enabled
+        provision_key                   = var.lb.kms_key == null
+
     }
 
     ## LOAD BALANCER DEFAULTS
@@ -13,6 +15,7 @@ locals {
         lb                              = {
             enable_deletion_protection  = false
             internal                    = true
+            preserve_host_header        = true
         }
         listener                        = {
             ssl_policy                  = "ELBSecurityPolicy-2016-08"
@@ -21,8 +24,11 @@ locals {
     
     ## CALCULATED PROPERTIES
     #   Properties that change based on deployment configurations
+    prefix                              = var.lb.load_balancer_type == "application" ? "ALB" : "NLB"
+                                        
     lb                                  = {
-        name                            = lower(join("-",[
+        name                            = upper(join("-",[
+                                            local.prefix,
                                             module.platform.prefixes.network.lb.name,
                                             var.lb.suffix
                                         ]))
@@ -33,11 +39,33 @@ locals {
                                             ]
                                         )
     }
+
+    # NOTE: have to override log bucket name, because the access policy has to be defined at the level
+    #       of this module. Access policy needs to know the ARN of the bucket, so have to force the name
+    #       at this level, rather than letting it get set by S3 module, in order to prevent an infinite
+    #       cycle.
+    bucket_name                         = lower(join("-",[
+                                            "s3",
+                                            module.platform.prefixes.network.lb.name,
+                                            var.lb.suffix,
+                                            "logs"
+                                        ]))
+    log_bucket                          = {
+        name_override                   = local.bucket_name
+        purpose                         = "Log bucket for ${local.lb.name} load balancer"
+        kms_key                         = {
+            aws_managed                 = true
+        }
+        versioning                      = false
+        policy                          = try(data.aws_iam_policy_document.log_access_policy[0].json, null)
+    }
+
     platform                            = merge({
-
+        # TODO: LB specific properties
     }, var.platform)
-    tags                                = merge({
 
+    tags                                = merge({
+        # TODO: LB specific tags
     }, module.platform.tags)
 
     ## LISTENER-RULE MAPPING
@@ -53,6 +81,17 @@ locals {
             } 
         ]
     ])
+
+    ## CERTIFICATE MAPPING
+    listener_certificates               = flatten([
+        for l_index, listener in var.lb.listeners: [
+            for c_index, certificate_arn in listener.certificate_arns: {
+                listener_index          = l_index
+                certificate_arn         = certificate_arn
+            }
+        ]
+    ])
+    
     # NOTE: The `target_group.target_id` attribute has to be made optional and then filtered
     #           on null values for this reason: when deploying ECS services, the attachment
     #           of containers to target groups is handled on the AWS side. However, the target
