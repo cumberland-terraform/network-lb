@@ -4,7 +4,7 @@ tflint {
 
 config {
     format          = "json"
-    force           = true
+    force           = false
     varfile         = [ ".ci/tests/idengr.tfvars" ]
 }
 
