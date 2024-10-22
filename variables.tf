@@ -36,13 +36,6 @@ variable "lb" {
       prefix                = "access"
     })
 
-    kms_key                 = optional(object({
-      aws_managed           = optional(bool, false)
-      id                    = optional(string, null)
-      arn                   = optional(string, null)
-      alias_arn             = optional(string, null)
-    }), null)
-
     security_groups         = optional(list(string), [])
 
     # <PROPERTY: `listeners`>
