@@ -37,7 +37,7 @@ pipeline {
 		}
 
 		stage ('Feature Branch Dependencies') {
-			when { expression {env.GIT_BRANCH =~ "origin/feature/*" || env.GIT_BRANCH =~ "origin/*PR*" || env.GIT_BRANCH =~ "origin/*PR*" } }
+			when { expression {env.GIT_BRANCH =~ "origin/feature/*" || env.GIT_BRANCH =~ "origin/*PR*"} }
 			steps {
 				sh '''
 					curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
@@ -62,13 +62,8 @@ pipeline {
 			}
 		}
 
-		/*
-		Uses recursive feature to lint subdirectories
-		Uses  force tag to return 0 exit code even when
-		issues are found. ONLY DURING INITIAL DEV
-		*/
 		stage ('Lint') {
-			when { expression {env.GIT_BRANCH =~ "origin/feature/*" || env.GIT_BRANCH =~ "origin/*PR*" || env.GIT_BRANCH =~ "origin/*PR*" } }
+			when { expression {env.GIT_BRANCH =~ "origin/feature/*" || env.GIT_BRANCH =~ "origin/*PR*"} }
 			steps {
 				sh '''
 					tflint \
@@ -77,38 +72,59 @@ pipeline {
 					tflint \
 						-f json \
 						--config .ci/.tflint.hcl \
-						| tee lint.json
-					aws s3 cp lint.json s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/lint/${BUILD_NUMBER}_lint_$(date +%s).json
+						> lint.json
 				'''
+			}
+			post {
+				always {
+					sh '''
+						cat lint.json
+						aws s3 cp lint.json s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/lint/${JOB_NAME}/${BUILD_NUMBER}_lint_$(date +%s).json
+					'''
+				}
 			}
 		}
 
 		stage ('Sec Scanning') {
-			when { expression {env.GIT_BRANCH =~ "origin/feature/*" || env.GIT_BRANCH =~ "origin/*PR*" || env.GIT_BRANCH =~ "origin/*PR*" } }
+			when { expression {env.GIT_BRANCH =~ "origin/feature/*" || env.GIT_BRANCH =~ "origin/*PR*" } }
 		    steps {
 				sh '''
 				    tfsec . \
 						--format json \
 						--no-colour \
-						--soft-fail \
 						--tfvars-file ./.ci/tests/idengr.tfvars \
-						| tee sec.json
-					aws s3 cp sec.json s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/sec/${BUILD_NUMBER}_sec_$(date +%s).json
+						> sec.json
 				'''
+			post {
+				always {
+					sh '''						
+						cat sec.json
+						aws s3 cp sec.json s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/sec/${JOB_NAME}/${BUILD_NUMBER}_sec_$(date +%s).json
+					'''
+					}
+				}
 			}
-		}
+		}	
 
 		stage ('Test') {
-			when { expression {env.GIT_BRANCH =~ "origin/feature/*" || env.GIT_BRANCH =~ "origin/*PR*" || env.GIT_BRANCH =~ "origin/*PR*" } }
+			when { expression {env.GIT_BRANCH =~ "origin/feature/*" || env.GIT_BRANCH =~ "origin/*PR*"} }
 			steps {
 				sh '''
 					terraform init \
 						-no-color
 					terraform test \
 						-test-directory ./.ci/tests \
-						-json | tee test.json || true
-					aws s3 cp test.json s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/test/${BUILD_NUMBER}_test_$(date +%s).json
-				'''
+						-json \
+						> test.json
+					'''
+			post {
+				always {
+					sh '''
+						cat test.json
+						aws s3 cp test.json s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/test/${JOB_NAME}/${BUILD_NUMBER}_test_$(date +%s).json
+					'''
+					}
+				}
 			}
 		}
 		
@@ -118,12 +134,14 @@ pipeline {
 				sh '''
 					terraform-docs \
 						-c .ci/.tfdocs_md.yml .
-					aws s3 cp tfdocs.md s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/tfdocs/${BUILD_NUMBER}_tfdocs_$(date +%s).md
-				'''
-				sh '''
+					aws s3 cp \
+						tfdocs.md \
+						s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/tfdocs/${BUILD_NUMBER}_tfdocs_$(date +%s).md
 					terraform-docs \
 						-c .ci/.tfdocs_json.yml .
-					aws s3 cp tfdocs.json s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/tfdocs/${BUILD_NUMBER}_tfdocs_$(date +%s).json
+					aws s3 cp \
+						tfdocs.json \
+						s3://s3-score1-mdt-eter-pipeline/${MODULE_NAME}/tfdocs/${BUILD_NUMBER}_tfdocs_$(date +%s).json
 				'''
 			}
 		}
@@ -131,12 +149,12 @@ pipeline {
 
 	post {
         failure {
-            emailext body: 'Check console output at $BUILD_URL to view the results. \n\n ${CHANGES} \n\n [JOB-INFO][JOB-INFO][JOB-INFO][JOB-INFO][JOB-INFO][JOB-INFO][JOB-INFO][JOB-INFO][JOB-INFO][JOB-INFO] \n${BUILD_LOG_REGEX,regex="ERROR", escapeHtml=false}',
+            emailext body: '$BUILD_URL to view the results.',
             to:   EMAIL_LIST,
             subject: 'Build failed in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
         }
         success {
-            emailext body: 'Check console output at $BUILD_URL to view the results.  \n\n ${CHANGES} \n\n [JOB-INFO][JOB-INFO][JOB-INFO][JOB-INFO][JOB-INFO][JOB-INFO][JOB-INFO][JOB-INFO][JOB-INFO][JOB-INFO] \n${BUILD_LOG, maxLines=100, escapeHtml=false}',
+            emailext body: '$BUILD_URL to view the results.',
             to:   EMAIL_LIST,
             subject: 'Build succeeded in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
         }
