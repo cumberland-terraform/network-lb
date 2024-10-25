@@ -4,8 +4,6 @@ locals {
     #       to different deployment configurations.
     conditions                          = {
         provision_log_bucket            = var.lb.connection_logs.enabled || var.lb.access_logs.enabled
-        provision_key                   = var.lb.kms_key == null
-
     }
 
     ## LOAD BALANCER DEFAULTS

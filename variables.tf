@@ -5,10 +5,10 @@ variable "platform" {
     acct_env                = string
     agency                  = string
     program                 = string
-    app_env                 = string
     availability_zones      = list(string)
     pca                     = string
     app                     = optional(string, null)
+    app_env                 = optional(string, null)
     aws_region              = optional(string, "US EAST 1")
     domain                  = optional(string, null)
     subnet_type             = optional(string, "PRIVATE")
@@ -35,13 +35,6 @@ variable "lb" {
       enabled               = false
       prefix                = "access"
     })
-
-    kms_key                 = optional(object({
-      aws_managed           = optional(bool, false)
-      id                    = optional(string, null)
-      arn                   = optional(string, null)
-      alias_arn             = optional(string, null)
-    }), null)
 
     security_groups         = optional(list(string), [])
 

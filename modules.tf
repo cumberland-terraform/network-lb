@@ -1,5 +1,5 @@
 module "platform" {
-  source                = "git::ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-platform.git?ref=v1.0.19"
+  source                = "git::ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-platform.git?ref=v1.0.19&depth=1"
 
   platform              = local.platform
   hydration             = {
@@ -9,16 +9,6 @@ module "platform" {
     rhel_sg_query       = false
     eks_ami_query       = false
   }
-}
-
-module "kms" {
-  count                 = local.conditions.provision_key ? 1 : 0
-  source                = "git::ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-core-security-kms.git?ref=v1.0.2"
-
-  kms            = {
-      alias_suffix      = "LB"
-  }
-  platform              = var.platform
 }
 
 module "log_bucket" {
