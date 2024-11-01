@@ -1,6 +1,6 @@
 resource "aws_lb" "this" {
     lifecycle {
-      ignore_changes                = [ tags, name ]
+      ignore_changes                = [ tags ]
     }
 
     enable_deletion_protection      = local.platform_defaults.lb.enable_deletion_protection
