@@ -1,10 +1,10 @@
 # Enterprise Terraform 
-## AWS Core Compute Elastic Load Balancer
-### Overview
+## Cumberland Cloud Platform
+## AWS Network - Load Balancing
 
-This is the Terraform Module for MDTHINK Platform compliant load balancers.
+This Terraform module provisions load balancers.
 
-**NOTE**: `mdt-eter-core-network-lb` is one of the more complicated modules supported by the MDTHINK DevOps team. It is recommended to read through the sections below carefully before employing this module.
+**NOTE**: `mdt-eter-core-network-lb` is one of the more complicated modules offered by the Cumberland Cloud. It is recommended to read through the sections below carefully before employing this module.
 
 ### Usage
 
@@ -29,19 +29,11 @@ provider "aws" {
 
 ```
 module "lb" {
-	source          		= "ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-aws-core-compute-lb.git"
+	source          		                = "github.com/cumberland-terraform/network-lb.git"
 	
 	platform	                                = {
-		aws_region                              = "<region-name>"
-                account                                 = "<account-name>"
-                acct_env                                = "<account-environment>"
-                agency                                  = "<agency>"
-                program                                 = "<program>"
-                app                                     = "<>"
-                app_env                                 = "<application-environment>"
-                domain                                  = "<active-directory-domain>"
-                pca                                     = "<pca-code>"
-                availability_zones                      = [ "<availability-zones>" ]
+		client                                  = "<client>"
+                environment                             = "<environment>"
 	}
 
 	lb			                        = {
@@ -57,7 +49,7 @@ module "lb" {
                                 target_group_index      = 0
                         }]
                 }]
-                security_groups                         = [ "sg-id" ]
+                security_groups                         = [ "<sg-id>" ]
                 target_groups                           = [{
                         port                            = 80
                         protocol                        = "HTTP"
@@ -71,7 +63,7 @@ module "lb" {
 
 TODO: Module does not currently support load balancers of type `network`.
 
-`platform` is a parameter for *all* **MDThink Enterprise Terraform** modules. For more information about the `platform`, in particular the permitted values of the nested fields, see the [mdt-eter-platform documentation](https://source.mdthink.maryland.gov/projects/etm/repos/mdt-eter-platform/browse). The following section goes into more detail regarding the `lb` variable.
+`platform` is a parameter for *all* **Cumberland Cloud Terraform** modules. For more information about the `platform`, in particular the permitted values of the nested fields, see the Platform module documentation for more infromation. The following section goes into more detail regarding the `lb` variable.
 
 ### Parameters
 
@@ -161,93 +153,3 @@ will create a load balancer with a listener that has a rule to forward to `<targ
 ### Accomodations for ECS Target Group Attachment
 
 The `var.lb.target_groups.*.target_id` attribute has to be made optional and allowed to default to `null`.Then the null values must be filtered out when creating the attachment for a load balancer target group. This is done to accomodate ECS deployments through the `mdt-eter-core-compute-ecs-svc` module. When deploying ECS services, the attachment of containers to target groups is handled on the AWS side. However, the target group must exist and be passed into the `mdt-eter-core-compute-ecs-svc` module. Therefore, this module has to create the target group for the ECS module, but **not** the the target group attachment. When using ECS, the target group being passed in through `var.lb.target_groups.*` should NOT contain `target_id` property for this reason. In other words, the target group attachment will not be provisioned unless the `target_id` for that target group is specified.
-
-## Contributing
-The below instructions are to be performed within Git Bash. Installation and setup of Git Bash can be found [here](https://git-scm.com/downloads/win)
-
-### Step 1 Clone or Update the Repo on your Machine
-Clone the repository to your local machine. Details on this process can be found [here](https://support.atlassian.com/bitbucket-cloud/docs/clone-a-git-repository/)
-
-```bash
-git checkout master
-git pull
-```
-
-### Step 2: Create Branch
-
-Create a branch from the `master` branch. The branch name should be formatted as follows:
-
-	feature/<TICKET_NUMBER>
-
-Where the value of `<TICKET_NUMBER>` is the ticket for which your work is associated. 
-
-The basic command for creating a branch is as follows:
-
-```bash
-git checkout -b feature/<TICKET_NUMBER>
-```
-
-For more information, refer to the documentation [here](https://docs.gitlab.com/ee/tutorials/make_first_git_commit/#create-a-branch-and-make-changes)
-
-### Step 3: Commit Changes
-
-Update the code and commit the changes,
-
-```bash
-git commit -am "<TICKET_NUMBER> - description of changes"
-```
-
-More information on commits can be found in the documentation [here](https://docs.gitlab.com/ee/tutorials/make_first_git_commit/#commit-and-push-your-changes)
-
-### Step 4: Merge With Master On Local
-
-
-```bash
-git checkout master
-git pull
-git checkout feature/<TICKET_NUMBER>
-git merge master
-```
-
-For more information, see [git documentation](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)
-
-
-### Step 5: Push Branch to Remote
-
-After committing changes, push the branch to the remote repository,
-
-```bash
-git push origin feature/<TICKET_NUMBER>
-```
-
-### Step 6: Pull Request
-
-Create a pull request. More information on this can be found [here](https://www.atlassian.com/git/tutorials/making-a-pull-request).
-
-Once the pull request is opened, a pipeline will kick off and execute a series of quality gates for linting, security scanning and testing tasks.
-
-### Step 7: Merge
-
-After the pipeline successfully validates the code and the Pull Request has been approved, merge the Pull Request in `master`.
-
-After the code changes are in master, the new version should be tagged. To apply a tag, the following commands can be executed,
-
-```bash
-git tag v1.0.1
-git push tag v1.0.1
-```
-
-Update the `CHANGELOG.md` with information about changes.
-
-### Pull Request Checklist
-
-Ensure each item on the following checklist is complete before updating any tenant deployments with a new version of this module,
-
-- [] Merge `master` into `feature/*` branch
-- [] Open PR from `feature/*` branch into `master` branch
-- [] Ensure tests are passing in Jenkins
-- [] Get approval from lead
-- [] Merge into `master`
-- [] Increment `git tag` version
-- [] Update Changelog
-- [] Publish latest version on Confluence

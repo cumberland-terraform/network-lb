@@ -1,5 +1,5 @@
 module "platform" {
-  source                = "git::ssh://git@source.mdthink.maryland.gov:22/etm/mdt-eter-platform.git?ref=v1.0.19&depth=1"
+  source                = "github.com/cumberland-terraform/platform.git"
 
   platform              = local.platform
   hydration             = {
@@ -14,7 +14,7 @@ module "platform" {
 module "log_bucket" {
   count                 = local.conditions.provision_log_bucket ? 1 : 0
 
-  source                = "git::ssh://mdt.global@source.mdthink.maryland.gov:22/etm/mdt-eter-core-storage-s3.git?depth=1"
+  source                = "github.com/cumberland-terraform/storage-s3.git"
 
   platform              = local.platform
   s3                    = local.log_bucket

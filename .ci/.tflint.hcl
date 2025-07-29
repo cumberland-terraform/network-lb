@@ -4,8 +4,6 @@ tflint {
 
 config {
     format          = "json"
-    force           = false
-    varfile         = [ ".ci/tests/idengr.tfvars" ]
 }
 
 plugin "aws" {
