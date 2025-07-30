@@ -27,7 +27,7 @@ locals {
     lb                                  = {
         name                            = upper(join("-",[
                                             local.prefix,
-                                            module.platform.prefixes.network.lb.name,
+                                            module.platform.prefix,
                                             var.lb.suffix
                                         ]))
         security_groups                 = concat(
@@ -44,7 +44,7 @@ locals {
     #       cycle.
     bucket_name                         = lower(join("-",[
                                             "s3",
-                                            module.platform.prefixes.network.lb.name,
+                                            module.platform.prefix,
                                             var.lb.suffix,
                                             "logs"
                                         ]))

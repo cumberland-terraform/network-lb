@@ -95,7 +95,7 @@ resource "aws_lb_target_group" "this" {
     }
     
     name                            = upper(join("-", [
-                                        module.platform.prefixes.network.lb.target_group,
+                                        module.platform.prefix,
                                         var.lb.suffix,
                                         "0${each.key}"
                                     ]))
