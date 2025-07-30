@@ -12,7 +12,6 @@ locals {
     platform_defaults                   = {
         lb                              = {
             enable_deletion_protection  = false
-            internal                    = true
             preserve_host_header        = true
         }
         listener                        = {

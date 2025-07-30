@@ -4,7 +4,7 @@ resource "aws_lb" "this" {
     }
 
     enable_deletion_protection      = local.platform_defaults.lb.enable_deletion_protection
-    internal                        = local.platform_defaults.lb.internal
+    internal                        = var.lb.internal
     preserve_host_header            = local.platform_defaults.lb.preserve_host_header
     load_balancer_type              = var.lb.load_balancer_type
     name                            = local.lb.name

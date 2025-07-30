@@ -104,6 +104,7 @@ variable "lb" {
     target_groups           = list(object({
       port                  = number
       protocol              = string
+      internal              = optional(bool, false)
       target_ids            = optional(list(string), null)
       target_type           = optional(string, "ip")
       health_check          = optional(object({
