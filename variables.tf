@@ -11,6 +11,7 @@ variable "lb" {
   description               = "Load Balancer configuration object. See [README] (https://source.mdthink.maryland.gov/projects/etm/repos/mdt-eter-core-compute-lb/browse) for detailed information about the permitted values for each field"
   type                      = object({
     load_balancer_type      = optional(string, "application")
+    internal                = optional(bool, false)
 
     connection_logs         = optional(object({
       enabled               = optional(bool, false)
@@ -104,7 +105,6 @@ variable "lb" {
     target_groups           = list(object({
       port                  = number
       protocol              = string
-      internal              = optional(bool, false)
       target_ids            = optional(list(string), null)
       target_type           = optional(string, "ip")
       health_check          = optional(object({
